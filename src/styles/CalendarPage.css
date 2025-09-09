@@ -1,0 +1,115 @@
+/* ====== CONTAINER CHUNG ====== */
+.calendar-container {
+  max-width: 1000px;
+  margin: auto;
+  padding: 20px;
+  font-family: "Poppins", sans-serif;
+}
+
+.calendar-container h2 {
+  text-align: center;
+  margin-bottom: 16px;
+  color: #333;
+  font-weight: bold;
+}
+
+/* ====== CALENDAR CHUNG ====== */
+.rbc-calendar {
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  background: #fff;
+}
+
+/* ====== EVENT CHUNG (month/week/day) ====== */
+.rbc-event {
+  border: none;
+  border-radius: 6px;
+  color: #fff;
+  font-weight: 500;
+  padding: 4px 6px;
+  font-size: 0.85rem;
+}
+
+/* ====== TODAY CELL ====== */
+.rbc-today {
+  background-color: #fff8e1 !important;
+}
+
+/* ====== TOOLBAR ====== */
+.rbc-toolbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 12px;
+  font-size: 0.95rem;
+}
+
+.rbc-toolbar button {
+  background: #3498db;
+  color: #fff;
+  border: none;
+  padding: 6px 10px;
+  border-radius: 6px;
+  margin: 0 4px;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.rbc-toolbar button:hover {
+  background: #2980b9;
+}
+
+/* ====== AGENDA VIEW ====== */
+.rbc-agenda-view {
+  background: #fff !important;
+  border-radius: 8px;
+  border: 1px solid #ddd;
+  padding: 10px;
+}
+
+/* Bảng agenda */
+.rbc-agenda-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.9rem;
+  font-family: "Poppins", sans-serif;
+}
+
+/* Header */
+.rbc-agenda-table thead tr {
+  background-color: #f7f7f7;
+  font-weight: bold;
+  text-align: center;
+}
+
+.rbc-agenda-table th {
+  padding: 8px;
+  border: 1px solid #ddd;
+  color: #333;
+}
+
+/* Body row */
+.rbc-agenda-table tbody tr {
+  transition: background-color 0.2s ease;
+}
+
+.rbc-agenda-table tbody tr:nth-child(even) {
+  background-color: #fafafa;
+}
+
+.rbc-agenda-table td {
+  padding: 8px;
+  border: 1px solid #eee;
+  vertical-align: middle;
+}
+
+/* Hover row */
+.rbc-agenda-table tbody tr:hover {
+  background-color: #f0f8ff;
+}
+
+/* Event cell trong agenda */
+.rbc-agenda-event-cell {
+  font-weight: 500;
+  color: #333;
+}

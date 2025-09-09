@@ -1,0 +1,40 @@
+.about-container {
+  text-align: center;
+  padding: 100px 20px;
+  background: linear-gradient(135deg, #6a11cb, #2575fc);
+  color: white;
+  min-height: 100vh;
+}
+
+.about-title {
+  font-size: 48px;
+  font-weight: bold;
+  margin-bottom: 20px;
+  animation: fadeIn 1s ease-in-out;
+}
+
+.about-desc {
+  font-size: 20px;
+  margin-bottom: 40px;
+}
+
+.btn-experience {
+  background: #ffcc00;
+  border: none;
+  padding: 15px 40px;
+  font-size: 20px;
+  font-weight: bold;
+  color: #333;
+  border-radius: 30px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-experience:hover {
+  background: #ffdb4d;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
