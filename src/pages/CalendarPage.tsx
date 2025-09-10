@@ -5,6 +5,7 @@ import {
   Views,
   type SlotInfo,
   type View,
+  // type NavigateAction,
 } from "react-big-calendar";
 import moment from "moment";
 import "react-big-calendar/lib/css/react-big-calendar.css";
@@ -35,6 +36,7 @@ const CalendarPage: React.FC = () => {
 
   // ★ quản lý view hiện tại để biết có đang ở AGENDA hay không
   const [currentView, setCurrentView] = useState<View>(Views.MONTH);
+  const [currentDate, setCurrentDate] = useState<Date>(new Date());
 
   const loadTasks = async () => {
     if (!auth.currentUser) return;
@@ -120,8 +122,14 @@ const CalendarPage: React.FC = () => {
         events={events}
         startAccessor="start"
         endAccessor="end"
-        view={currentView} // dùng state
-        onView={(v) => setCurrentView(v)} // cập nhật khi người dùng bấm toolbar
+        view={currentView}
+        onView={(v) => setCurrentView(v)}
+        date={currentDate} // ★ truyền ngày hiện tại
+        onNavigate={(date, view) => {
+          // ★ cập nhật khi bấm Back/Next/Today
+          setCurrentDate(date);
+          if (view) setCurrentView(view); // giữ đồng bộ nếu action đổi view
+        }}
         defaultView={Views.MONTH}
         views={[Views.MONTH, Views.WEEK, Views.DAY, Views.AGENDA]}
         style={{ height: 600 }}

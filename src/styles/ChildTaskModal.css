@@ -1,5 +1,4 @@
-/* Modal Base Classes */
-.modal-overlay {
+.child-modal-overlay {
   position: fixed;
   top: 0;
   left: 0;
@@ -9,10 +8,11 @@
   display: flex;
   align-items: center;
   justify-content: center;
-  z-index: 1000;
+  z-index: 1100;
+  animation: fadeIn 0.3s ease;
 }
 
-.modal-box {
+.child-modal-content {
   background: white;
   border-radius: 12px;
   padding: 24px;
@@ -20,22 +20,23 @@
   max-width: 500px;
   max-height: 90vh;
   overflow-y: auto;
+  animation: slideIn 0.3s ease;
 }
 
-.modal-header {
+.child-modal-header {
   display: flex;
   justify-content: space-between;
   align-items: center;
   margin-bottom: 24px;
 }
 
-.modal-title {
+.child-modal-header h3 {
   margin: 0;
   color: #2d3748;
   font-size: 1.5rem;
 }
 
-.btn-close {
+.close-button {
   background: none;
   border: none;
   font-size: 24px;
@@ -45,12 +46,11 @@
   border-radius: 4px;
 }
 
-.btn-close:hover {
+.close-button:hover {
   background: #f7fafc;
   color: #4a5568;
 }
 
-/* Form Elements */
 .form-group {
   margin-bottom: 16px;
 }
@@ -77,8 +77,12 @@
   box-shadow: 0 0 0 3px rgba(66, 153, 225, 0.2);
 }
 
-/* Buttons */
-.modal-actions {
+textarea.input {
+  min-height: 100px;
+  resize: vertical;
+}
+
+.child-modal-actions {
   display: flex;
   justify-content: flex-end;
   gap: 12px;
@@ -107,15 +111,6 @@
   background: #edf2f7;
   color: #4a5568;
   border: 1px solid #e2e8f0;
-}
-
-/* Animations */
-.animate-fadeIn {
-  animation: fadeIn 0.3s ease;
-}
-
-.animate-slideIn {
-  animation: slideIn 0.3s ease;
 }
 
 @keyframes fadeIn {

@@ -93,7 +93,7 @@ const TasksPage: React.FC = () => {
       />
 
       <p className="welcome-text">
-        Chào mừng bạn đã đến lịch hoạt động một ngày ✨
+        Chào mừng bạn đã đến lịch hoạt động của bạn ✨
       </p>
 
       {/* Actions */}

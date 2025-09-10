@@ -111,6 +111,21 @@
   animation: fadeInUp 0.8s ease;
 }
 
+.btn-task {
+  background: linear-gradient(135deg, #FF8008, #FFC837);
+  color: white;
+  padding: 10px 18px;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+}
+
+.btn-task:hover {
+  transform: scale(1.05);
+  opacity: 0.9;
+}
+
 /* Animations */
 @keyframes fadeIn {
   from { opacity: 0; }
