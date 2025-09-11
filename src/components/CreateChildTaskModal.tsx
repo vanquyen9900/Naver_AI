@@ -64,13 +64,38 @@ const CreateChildTaskModal: React.FC<Props> = ({
 
   if (!open) return null;
 
+  // Thêm hàm validate
+  const validateDates = (start: string, end: string): string | null => {
+    const now = new Date();
+    const startDate = start ? new Date(start) : null;
+
+    if (!editTask && startDate && startDate < now) {
+      return "Thời gian bắt đầu không thể trong quá khứ";
+    }
+
+    if (start && end && new Date(start) > new Date(end)) {
+      return "Thời gian bắt đầu phải trước thời gian kết thúc";
+    }
+
+    return null;
+  };
+
+  // Sửa hàm handleSave
   const handleSave = async () => {
     if (!auth.currentUser) {
       toast.error("Bạn chưa đăng nhập");
       return;
     }
+
     if (!childName.trim() || !childDetail.trim()) {
       toast.error("Tên và chi tiết công việc con không được để trống");
+      return;
+    }
+
+    // Thêm validate dates
+    const dateError = validateDates(childStartTime, childEndTime);
+    if (dateError) {
+      toast.error(dateError);
       return;
     }
 

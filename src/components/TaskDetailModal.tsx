@@ -5,6 +5,7 @@ import {
   LEVEL_LABELS,
   getChildTasksByParentId,
   createChildTask,
+  // updateChildTask,
 } from "../services/firestore";
 import {
   TaskStatus,
@@ -12,9 +13,9 @@ import {
   getTaskProgress,
 } from "../services/taskProgress";
 import { toast } from "react-toastify";
-import "../styles/TaskDetailModal.css";
-import CreateChildTaskModal from "./CreateChildTaskModal";
 import { auth } from "../services/firebase";
+import CreateChildTaskModal from "./CreateChildTaskModal";
+import "../styles/TaskDetailModal.css";
 
 interface Props {
   open: boolean;
@@ -29,14 +30,10 @@ const TaskDetailModal: React.FC<Props> = ({ open, onClose, task }) => {
   >({});
   const [loading, setLoading] = useState(false);
   const [showAddChildModal, setShowAddChildModal] = useState(false);
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [selectedChildTask, setSelectedChildTask] = useState<TaskChild | null>(
-    null
-  );
+  const [editingTask, setEditingTask] = useState<TaskChild | null>(null);
 
-  // Load child tasks and their statuses
   useEffect(() => {
-    const loadChildTasksAndStatuses = async () => {
+    const loadChildTasks = async () => {
       if (!task?.id) return;
 
       setLoading(true);
@@ -59,12 +56,12 @@ const TaskDetailModal: React.FC<Props> = ({ open, onClose, task }) => {
     };
 
     if (open && task) {
-      loadChildTasksAndStatuses();
+      loadChildTasks();
     }
   }, [open, task]);
 
   const handleStatusToggle = async (childId: string) => {
-    const currentStatus = childStatuses[childId] || TaskStatus.NOT_STARTED;
+    const currentStatus = childStatuses[childId];
     const newStatus =
       currentStatus === TaskStatus.COMPLETED
         ? TaskStatus.NOT_STARTED
@@ -73,7 +70,6 @@ const TaskDetailModal: React.FC<Props> = ({ open, onClose, task }) => {
     try {
       await updateTaskProgress(childId, newStatus);
       setChildStatuses((prev) => ({ ...prev, [childId]: newStatus }));
-      toast.success("Đã cập nhật trạng thái");
     } catch (err) {
       console.error(err);
       toast.error("Không thể cập nhật trạng thái");
@@ -81,7 +77,7 @@ const TaskDetailModal: React.FC<Props> = ({ open, onClose, task }) => {
   };
 
   const handleCancelRestore = async (childId: string) => {
-    const currentStatus = childStatuses[childId] || TaskStatus.NOT_STARTED;
+    const currentStatus = childStatuses[childId];
     const newStatus =
       currentStatus === TaskStatus.CANCELLED
         ? TaskStatus.NOT_STARTED
@@ -101,21 +97,32 @@ const TaskDetailModal: React.FC<Props> = ({ open, onClose, task }) => {
     }
   };
 
-  const formatDate = (date: Date | null | undefined) => {
-    if (!date) return null;
-    return {
-      date: new Date(date).toLocaleDateString("vi-VN", {
-        weekday: "long",
-        year: "numeric",
-        month: "2-digit",
-        day: "2-digit",
-      }),
-      time: new Date(date).toLocaleTimeString("vi-VN", {
-        hour: "2-digit",
-        minute: "2-digit",
-      }),
-    };
+  const handleEditTask = (childTask: TaskChild) => {
+    setEditingTask(childTask);
+    setShowAddChildModal(true);
   };
+
+  const formatDate = (date: Date | null | undefined) => {
+    if (!date) return "Chưa đặt";
+    return new Date(date).toLocaleString("vi-VN", {
+      weekday: "long",
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+      hour: "2-digit",
+      minute: "2-digit",
+    });
+  };
+
+  // Sort tasks: active first, then cancelled
+  const sortedChildTasks = [...childTasks].sort((a, b) => {
+    const statusA = childStatuses[a.id] === TaskStatus.CANCELLED ? 1 : 0;
+    const statusB = childStatuses[b.id] === TaskStatus.CANCELLED ? 1 : 0;
+    if (statusA !== statusB) return statusA - statusB;
+    // If same status, sort by level then by end time
+    if (a.level !== b.level) return (a.level || 5) - (b.level || 5);
+    return (a.end_time?.getTime() || 0) - (b.end_time?.getTime() || 0);
+  });
 
   if (!open || !task) return null;
 
@@ -123,132 +130,145 @@ const TaskDetailModal: React.FC<Props> = ({ open, onClose, task }) => {
     <div className="detail-modal-overlay">
       <div className="detail-modal-content">
         <div className="detail-modal-header">
-          <div className="task-info">
-            <h2>{task.task_name}</h2>
-            <div className="task-dates">
-              {task.start_time && (
-                <span>
-                  Bắt đầu: {formatDate(task.start_time)?.date}
-                  <br />
-                  <span className="time-value">
-                    ⏰ {formatDate(task.start_time)?.time}
-                  </span>
-                </span>
-              )}
-              {task.end_time && (
-                <span>
-                  Kết thúc: {formatDate(task.end_time)?.date}
-                  <br />
-                  <span className="time-value">
-                    ⏰ {formatDate(task.end_time)?.time}
-                  </span>
-                </span>
-              )}
-            </div>
-          </div>
-          <button className="close-button" onClick={onClose}>
+          <h2>{task.task_name}</h2>
+          <button className="close-btn" onClick={onClose}>
             ×
           </button>
         </div>
 
-        <div className="detail-actions">
-          <button
-            className="btn btn-primary"
-            onClick={() => setShowAddChildModal(true)}
-          >
-            ➕ Thêm công việc con
-          </button>
+        <div className="task-parent-info">
+          <div className="task-meta">
+            <span className={`task-level level-${task.level}`}>
+              {task.level ? LEVEL_LABELS[task.level] : "Chưa phân loại"}
+            </span>
+          </div>
+          <div className="task-dates">
+            <div className="date-item">
+              <span className="date-label">Bắt đầu:</span>
+              <span className="date-value">{formatDate(task.start_time)}</span>
+            </div>
+            <div className="date-item">
+              <span className="date-label">Kết thúc:</span>
+              <span className="date-value">{formatDate(task.end_time)}</span>
+            </div>
+          </div>
         </div>
 
-        {loading ? (
-          <div className="loading-state">
-            <div className="loading-spinner"></div>
-            <p>Đang tải danh sách công việc con...</p>
+        <div className="child-tasks-section">
+          <div className="section-header">
+            <h3>Danh sách công việc con</h3>
+            <button
+              className="add-child-btn"
+              onClick={() => {
+                setEditingTask(null);
+                setShowAddChildModal(true);
+              }}
+            >
+              ➕ Thêm công việc con
+            </button>
           </div>
-        ) : (
-          <div className="notebook-tasks">
-            {childTasks.length > 0 ? (
-              childTasks.map((child) => (
+
+          {loading ? (
+            <div className="loading-state">
+              <div className="loading-spinner" />
+              <p>Đang tải danh sách công việc con...</p>
+            </div>
+          ) : sortedChildTasks.length > 0 ? (
+            <div className="child-tasks-list">
+              {sortedChildTasks.map((child, index) => (
                 <div
                   key={child.id}
                   className={`child-task-item ${
                     childStatuses[child.id] === TaskStatus.CANCELLED
-                      ? "child-task-cancelled"
+                      ? "cancelled"
                       : ""
                   }`}
+                  style={{ "--index": index } as React.CSSProperties}
                 >
-                  <input
-                    type="checkbox"
-                    className="child-task-checkbox"
-                    checked={childStatuses[child.id] === TaskStatus.COMPLETED}
-                    onChange={() => handleStatusToggle(child.id)}
-                    disabled={childStatuses[child.id] === TaskStatus.CANCELLED}
-                  />
-                  <div className="child-task-content">
-                    <h4>{child.task_name}</h4>
-                    {child.task_detail && <p>{child.task_detail}</p>}
-                    <div className="child-task-meta">
+                  <div className="task-checkbox">
+                    <input
+                      type="checkbox"
+                      checked={childStatuses[child.id] === TaskStatus.COMPLETED}
+                      onChange={() => handleStatusToggle(child.id)}
+                      disabled={
+                        childStatuses[child.id] === TaskStatus.CANCELLED
+                      }
+                    />
+                  </div>
+
+                  <div className="task-content">
+                    <div className="task-main">
+                      <h4>{child.task_name}</h4>
+                      {child.task_detail && <p>{child.task_detail}</p>}
+                    </div>
+                  </div>
+
+                  <div className="task-metadata">
+                    <div className="level-container">
                       <span className={`task-level level-${child.level}`}>
                         {child.level
                           ? LEVEL_LABELS[child.level]
                           : "Chưa phân loại"}
                       </span>
-                      <div className="task-date">
-                        {child.start_time && (
-                          <span>
-                            Bắt đầu: {formatDate(child.start_time)?.date}
-                            <br />
-                            <span className="time-value">
-                              ⏰ {formatDate(child.start_time)?.time}
-                            </span>
-                          </span>
-                        )}
-                        {child.end_time && (
-                          <span>
-                            Kết thúc: {formatDate(child.end_time)?.date}
-                            <br />
-                            <span className="time-value">
-                              ⏰ {formatDate(child.end_time)?.time}
-                            </span>
-                          </span>
-                        )}
+                    </div>
+                    <div className="task-times">
+                      <div className="time-item">
+                        <i className="far fa-calendar-alt"></i>
+                        <span>{formatDate(child.start_time)}</span>
+                      </div>
+                      <div className="time-item">
+                        <i className="far fa-calendar-check"></i>
+                        <span>{formatDate(child.end_time)}</span>
                       </div>
                     </div>
                   </div>
-                  <button
-                    className={`status-toggle-btn ${
-                      childStatuses[child.id] === TaskStatus.CANCELLED
-                        ? "restore"
-                        : "cancel"
-                    }`}
-                    onClick={() => handleCancelRestore(child.id)}
-                    title={
-                      childStatuses[child.id] === TaskStatus.CANCELLED
-                        ? "Khôi phục"
-                        : "Huỷ bỏ"
-                    }
-                  >
-                    {childStatuses[child.id] === TaskStatus.CANCELLED
-                      ? "🔄"
-                      : "🗑️"}
-                  </button>
+
+                  <div className="task-actions">
+                    {childStatuses[child.id] !== TaskStatus.CANCELLED && (
+                      <button
+                        className="action-btn edit"
+                        onClick={() => handleEditTask(child)}
+                        title="Chỉnh sửa"
+                      >
+                        ✏️
+                      </button>
+                    )}
+                    <button
+                      className={`action-btn ${
+                        childStatuses[child.id] === TaskStatus.CANCELLED
+                          ? "restore"
+                          : "cancel"
+                      }`}
+                      onClick={() => handleCancelRestore(child.id)}
+                      title={
+                        childStatuses[child.id] === TaskStatus.CANCELLED
+                          ? "Khôi phục"
+                          : "Huỷ bỏ"
+                      }
+                    >
+                      {childStatuses[child.id] === TaskStatus.CANCELLED
+                        ? "🔄"
+                        : "🗑️"}
+                    </button>
+                  </div>
                 </div>
-              ))
-            ) : (
-              <div className="empty-state">
-                <p>Chưa có công việc con nào.</p>
-                <p>Hãy thêm công việc con để bắt đầu! ✨</p>
-              </div>
-            )}
-          </div>
-        )}
+              ))}
+            </div>
+          ) : (
+            <div className="empty-state">
+              <p>Chưa có công việc con nào</p>
+              <p>Hãy thêm công việc con để bắt đầu! ✨</p>
+            </div>
+          )}
+        </div>
 
         <CreateChildTaskModal
           open={showAddChildModal}
           onClose={() => {
             setShowAddChildModal(false);
-            setSelectedChildTask(null);
+            setEditingTask(null);
           }}
+          editTask={editingTask}
           onSaved={async (newChild) => {
             if (!task?.id || !auth.currentUser) return;
 
@@ -256,13 +276,7 @@ const TaskDetailModal: React.FC<Props> = ({ open, onClose, task }) => {
               const childId = await createChildTask(
                 auth.currentUser.uid,
                 task.id,
-                {
-                  task_name: newChild.task_name,
-                  task_detail: newChild.task_detail,
-                  start_time: newChild.start_time,
-                  end_time: newChild.end_time,
-                  level: newChild.level,
-                }
+                newChild
               );
 
               const updatedChildren = await getChildTasksByParentId(task.id);
@@ -273,11 +287,20 @@ const TaskDetailModal: React.FC<Props> = ({ open, onClose, task }) => {
                 [childId]: TaskStatus.NOT_STARTED,
               }));
 
-              toast.success("Đã thêm công việc con");
+              toast.success(
+                editingTask
+                  ? "Đã cập nhật công việc con"
+                  : "Đã thêm công việc con"
+              );
               setShowAddChildModal(false);
+              setEditingTask(null);
             } catch (err) {
               console.error(err);
-              toast.error("Không thể thêm công việc con");
+              toast.error(
+                editingTask
+                  ? "Không thể cập nhật công việc con"
+                  : "Không thể thêm công việc con"
+              );
             }
           }}
           parentStartTime={task.start_time?.toISOString().slice(0, 16)}

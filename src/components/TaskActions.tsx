@@ -24,6 +24,9 @@ const TaskActions: React.FC<Props> = ({ onCreate, onReload }) => {
       <button className="btn-task" onClick={() => navigate("/tasks")}>
         📋 Danh sách tasks
       </button>
+      <button className="btn-history" onClick={() => navigate("/history")}>
+        📜 Lịch sử tasks
+      </button>
     </div>
   );
 };

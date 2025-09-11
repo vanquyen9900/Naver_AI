@@ -58,11 +58,6 @@ const TasksPage: React.FC = () => {
     setModalOpen(true);
   };
 
-  const handleDeleteRequest = (t: TaskItem) => {
-    setToDelete(t);
-    setConfirmOpen(true);
-  };
-
   const handleConfirmDelete = async () => {
     if (!toDelete) return;
     try {
@@ -104,11 +99,7 @@ const TasksPage: React.FC = () => {
         {loading ? (
           <p>Đang tải...</p>
         ) : (
-          <TaskList
-            tasks={tasks}
-            onEdit={handleEdit}
-            onDelete={handleDeleteRequest}
-          />
+          <TaskList tasks={tasks} onEdit={handleEdit} />
         )}
       </div>
 

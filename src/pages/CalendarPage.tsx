@@ -1,17 +1,17 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import {
   Calendar,
   momentLocalizer,
   Views,
   type SlotInfo,
   type View,
-  // type NavigateAction,
+  type Event,
 } from "react-big-calendar";
 import moment from "moment";
 import "react-big-calendar/lib/css/react-big-calendar.css";
 import "../styles/CalendarPage.css";
 import { auth } from "../services/firebase";
-import { getTasksWithLevelsByUser, type TaskItem } from "../services/firestore";
+import { getTasksWithLevelsByUser } from "../services/firestore";
 import CreateEditTaskModal from "../components/CreateEditTaskModal";
 import { toast } from "react-toastify";
 import UserHeader from "../components/UserHeader";
@@ -19,7 +19,7 @@ import TaskActions from "../components/TaskActions";
 
 const localizer = momentLocalizer(moment);
 
-interface CalendarEvent {
+interface CalendarEvent extends Event {
   id: string;
   title: string;
   start: Date;
@@ -28,50 +28,47 @@ interface CalendarEvent {
   level?: number;
 }
 
+interface EventProps {
+  event: CalendarEvent;
+}
+
 const CalendarPage: React.FC = () => {
   const [events, setEvents] = useState<CalendarEvent[]>([]);
   const [modalOpen, setModalOpen] = useState(false);
   const [defaultStart, setDefaultStart] = useState<Date | null>(null);
   const [defaultEnd, setDefaultEnd] = useState<Date | null>(null);
-
-  // ★ quản lý view hiện tại để biết có đang ở AGENDA hay không
   const [currentView, setCurrentView] = useState<View>(Views.MONTH);
   const [currentDate, setCurrentDate] = useState<Date>(new Date());
 
-  const loadTasks = async () => {
+  const loadTasks = useCallback(async () => {
     if (!auth.currentUser) return;
     try {
-      const list: TaskItem[] = await getTasksWithLevelsByUser(
-        auth.currentUser.uid
-      );
-      const mapped: CalendarEvent[] = list.map((t) => ({
-        id: t.id,
-        title: t.task_name,
-        start: t.start_time ?? new Date(),
-        end: t.end_time ?? new Date(),
+      const tasks = await getTasksWithLevelsByUser(auth.currentUser.uid);
+      const calendarEvents = tasks.map((task) => ({
+        id: task.id,
+        title: task.task_name,
+        start: task.start_time ?? new Date(),
+        end: task.end_time ?? new Date(),
         allDay: false,
-        level: t.level != null ? t.level : undefined,
+        level: task.level,
       }));
-      setEvents(mapped);
-      // debug nếu cần:
-      // console.debug("[CalendarPage] Loaded events:", mapped);
-    } catch (err) {
-      console.error(err);
-      toast.error("Không tải được dữ liệu lịch");
+      setEvents(calendarEvents);
+    } catch (error) {
+      console.error("Failed to load tasks:", error);
+      toast.error("Không thể tải danh sách công việc");
     }
-  };
+  }, []);
 
   useEffect(() => {
     loadTasks();
-  }, []);
+  }, [loadTasks]);
 
-  const handleSelectSlot = (slotInfo: SlotInfo) => {
+  const handleSelectSlot = useCallback((slotInfo: SlotInfo) => {
     setDefaultStart(slotInfo.start as Date);
     setDefaultEnd(slotInfo.end as Date);
     setModalOpen(true);
-  };
+  }, []);
 
-  // màu cho từng level (1..5)
   const levelColors: Record<number, string> = {
     5: "#2ecc71",
     4: "#27ae60",
@@ -80,62 +77,127 @@ const CalendarPage: React.FC = () => {
     1: "#e74c3c",
   };
 
-  const eventPropGetter = (event: CalendarEvent) => {
-    // nếu đang ở Agenda view -> trả về style "trong suốt" (không phủ màu)
-    if (currentView === Views.AGENDA) {
+  const isFullDayEvent = useCallback((event: CalendarEvent) => {
+    return (
+      moment(event.start)
+        .startOf("day")
+        .isSame(moment(event.end).startOf("day")) &&
+      moment(event.start).format("HH:mm") === "00:00" &&
+      moment(event.end).format("HH:mm") === "23:59"
+    );
+  }, []);
+
+  const eventPropGetter = useCallback(
+    (event: CalendarEvent) => {
+      const level = Number(event.level ?? 0);
+      const color = levelColors[level] || "#3498db";
+      const isFullDay = isFullDayEvent(event);
+      const currentDateMoment = moment(currentDate);
+      const isStart = currentDateMoment.isSame(event.start, "day");
+      const isEnd = currentDateMoment.isSame(event.end, "day");
+      const isMiddleDay =
+        !isStart &&
+        !isEnd &&
+        currentDateMoment.isBetween(event.start, event.end, "day", "[]");
+
+      let className = "";
+      if (isFullDay) className = "full-day";
+      else if (isMiddleDay) className = "middle-day";
+      else if (isStart) className = "start-day";
+      else if (isEnd) className = "end-day";
+
       return {
+        className: `event-base ${className}`,
         style: {
-          backgroundColor: "transparent",
-          color: "#333",
-          border: "none",
-          boxShadow: "none",
+          backgroundColor: isFullDay ? "transparent" : color,
+          borderColor: color,
+          color: isFullDay ? "#2c3e50" : "#fff",
         },
       };
-    }
+    },
+    [currentDate, isFullDayEvent, levelColors]
+  );
 
-    // ngược lại (Month/Week/Day) => gán màu theo level
-    const level = Number(event.level ?? 0);
-    const color = levelColors[level] || "#3498db";
-    return {
-      style: {
-        backgroundColor: color,
-        borderRadius: "6px",
-        opacity: 0.95,
-        color: "#fff",
-        border: "0px",
-        display: "block",
-      },
-    };
-  };
+  const EventComponent = useCallback(
+    ({ event }: EventProps) => {
+      const currentDateMoment = moment(currentDate);
+      const isFullDay = isFullDayEvent(event);
+      const isStart = currentDateMoment.isSame(event.start, "day");
+      const isEnd = currentDateMoment.isSame(event.end, "day");
+      const isMiddleDay =
+        !isStart &&
+        !isEnd &&
+        currentDateMoment.isBetween(event.start, event.end, "day", "[]");
+
+      if (isFullDay) {
+        return (
+          <div className="event-content full-day">
+            <span className="event-title">{event.title}</span>
+          </div>
+        );
+      }
+
+      if (isMiddleDay) {
+        return (
+          <div className="event-content middle-day">
+            <span className="event-title">{event.title}</span>
+          </div>
+        );
+      }
+
+      return (
+        <div className="event-content">
+          {isStart && (
+            <div className="event-time start-time">
+              {moment(event.start).format("HH:mm")}
+            </div>
+          )}
+          <span className="event-title">{event.title}</span>
+          {isEnd && (
+            <div className="event-time end-time">
+              {moment(event.end).format("HH:mm")}
+            </div>
+          )}
+        </div>
+      );
+    },
+    [currentDate, isFullDayEvent]
+  );
 
   return (
     <div className="calendar-container">
       <UserHeader
-        displayName={auth.currentUser?.displayName}
-        photoURL={auth.currentUser?.photoURL ?? ""}
+        displayName={auth.currentUser?.displayName || ""}
+        photoURL={auth.currentUser?.photoURL || ""}
       />
-      <h2>📅 Lịch tháng của bạn</h2>
+      <h2>📅 Lịch của bạn</h2>
       <TaskActions onCreate={() => setModalOpen(true)} onReload={loadTasks} />
 
-      <Calendar
+      <Calendar<CalendarEvent>
         localizer={localizer}
         events={events}
         startAccessor="start"
         endAccessor="end"
         view={currentView}
-        onView={(v) => setCurrentView(v)}
-        date={currentDate} // ★ truyền ngày hiện tại
-        onNavigate={(date, view) => {
-          // ★ cập nhật khi bấm Back/Next/Today
-          setCurrentDate(date);
-          if (view) setCurrentView(view); // giữ đồng bộ nếu action đổi view
-        }}
+        onView={setCurrentView}
+        date={currentDate}
+        onNavigate={setCurrentDate}
         defaultView={Views.MONTH}
         views={[Views.MONTH, Views.WEEK, Views.DAY, Views.AGENDA]}
         style={{ height: 600 }}
         selectable
         onSelectSlot={handleSelectSlot}
         popup
+        formats={{
+          dayFormat: "DD",
+          dayRangeHeaderFormat: ({ start, end }: { start: Date; end: Date }) =>
+            `${moment(start).format("DD/MM")} - ${moment(end).format(
+              "DD/MM/YYYY"
+            )}`,
+        }}
+        components={{
+          event: EventComponent,
+        }}
         eventPropGetter={eventPropGetter}
       />
 
@@ -144,11 +206,11 @@ const CalendarPage: React.FC = () => {
         onClose={() => setModalOpen(false)}
         edit={null}
         onSaved={loadTasks}
-        defaultStart={defaultStart}
-        defaultEnd={defaultEnd}
+        defaultStart={defaultStart ?? undefined}
+        defaultEnd={defaultEnd ?? undefined}
       />
     </div>
   );
 };
 
-export default CalendarPage;
+export default React.memo(CalendarPage);

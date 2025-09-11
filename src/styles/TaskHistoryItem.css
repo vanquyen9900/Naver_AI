@@ -1,0 +1,273 @@
+/* Task item container */
+.history-item {
+  background: white;
+  border-radius: 1rem;
+  overflow: hidden;
+  border: 1px solid #e2e8f0;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  transform-origin: center;
+}
+
+.history-item:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 12px 20px -8px rgba(66,153,225,0.15);
+}
+
+/* Header section */
+.history-item-header {
+  padding: 1.5rem;
+  cursor: pointer;
+  position: relative;
+  background: linear-gradient(to right, #f8fafc, white);
+  transition: all 0.3s ease;
+}
+
+.history-item.expanded .history-item-header {
+  background: linear-gradient(135deg, #4299e1, #2b6cb0);
+  padding-bottom: 2rem;
+}
+
+.header-content {
+  display: grid;
+  grid-template-columns: 2fr 1fr;
+  gap: 2rem;
+  position: relative;
+  z-index: 1;
+}
+
+/* Task main info */
+.task-main-info {
+  animation: fadeIn 0.3s ease-out;
+}
+
+.task-main-info h3 {
+  font-size: 1.25rem;
+  font-weight: 600;
+  color: #2d3748;
+  margin: 0 0 0.5rem 0;
+  transition: color 0.3s ease;
+}
+
+.task-main-info p {
+  color: #4a5568;
+  font-size: 0.95rem;
+  line-height: 1.5;
+  margin: 0 0 1rem 0;
+}
+
+.history-item.expanded .task-main-info h3,
+.history-item.expanded .task-main-info p {
+  color: white;
+}
+
+/* Task metadata */
+.task-meta {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.task-level {
+  padding: 0.4rem 1rem;
+  border-radius: 1rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+/* Status badges */
+.task-status {
+  padding: 0.4rem 1rem;
+  border-radius: 1rem;
+  font-size: 0.85rem;
+  font-weight: 600;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+/* Time information */
+.time-info {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+  color: #4a5568;
+  transition: color 0.3s ease;
+}
+
+.history-item.expanded .time-info {
+  color: white;
+}
+
+.time-item {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+}
+
+.time-label {
+  font-size: 0.9rem;
+  opacity: 0.9;
+}
+
+.time-value {
+  font-size: 0.95rem;
+  font-weight: 500;
+}
+
+.time-detail {
+  font-size: 0.9rem;
+  opacity: 0.8;
+  display: flex;
+  align-items: center;
+  gap: 0.25rem;
+}
+
+/* Expand button */
+.expand-btn {
+  position: absolute;
+  right: 1.5rem;
+  bottom: 1rem;
+  background: transparent;
+  border: none;
+  width: 2rem;
+  height: 2rem;
+  border-radius: 50%;
+  color: #4299e1;
+  font-size: 1.2rem;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.history-item.expanded .expand-btn {
+  color: white;
+  transform: rotate(180deg);
+}
+
+/* Child tasks container */
+.child-tasks-container {
+  background: #f8fafc;
+  overflow: hidden;
+  padding: 0.5rem;
+}
+
+.child-task-item {
+  background: white;
+  border-radius: 0.75rem;
+  margin-bottom: 1rem;
+  border: 1px solid #e2e8f0;
+  opacity: 0;
+  transform: translateX(-20px);
+  animation: slideIn 0.3s ease-out forwards;
+}
+
+.child-task-item:last-child {
+  margin-bottom: 0;
+}
+
+.child-task-item .header-content {
+  padding: 1rem;
+  grid-template-columns: 2fr 1fr;
+  gap: 1.5rem;
+}
+
+.child-task-item .task-main-info h4 {
+  font-size: 1.1rem;
+  font-weight: 600;
+  color: #2d3748;
+  margin: 0 0 0.5rem 0;
+}
+
+.child-task-item .task-main-info p {
+  font-size: 0.9rem;
+  margin: 0 0 0.75rem 0;
+}
+
+.child-task-item .task-meta {
+  gap: 0.75rem;
+}
+
+.child-task-item .time-info {
+  gap: 0.75rem;
+}
+
+.child-task-item:nth-child(odd) {
+  background: linear-gradient(to right, #f8fafc, white);
+}
+
+.child-task-item .time-value {
+  font-size: 0.9rem;
+}
+
+.child-task-item .time-detail {
+  font-size: 0.85rem;
+}
+
+/* Status colors with gradients */
+.status-1 { /* Not Started */
+  background: linear-gradient(135deg, #edf2f7, #e2e8f0);
+  color: #2d3748;
+}
+
+.status-2 { /* In Progress */
+  background: linear-gradient(135deg, #ebf8ff, #bee3f8);
+  color: #2c5282;
+}
+
+.status-3 { /* Completed */
+  background: linear-gradient(135deg, #f0fff4, #c6f6d5);
+  color: #276749;
+}
+
+.status-4 { /* Cancelled */
+  background: linear-gradient(135deg, #fff5f5, #fed7d7);
+  color: #9b2c2c;
+}
+
+
+
+/* Animations */
+@keyframes slideIn {
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to { opacity: 1; }
+}
+
+@keyframes expandDown {
+  from {
+    max-height: 0;
+    opacity: 0;
+  }
+  to {
+    max-height: 1000px;
+    opacity: 1;
+  }
+}
+
+/* Apply animation delays to child items */
+.child-task-item {
+  animation-delay: calc(var(--index) * 100ms);
+}
+
+/* Empty state for child tasks */
+.no-children {
+  text-align: center;
+  padding: 2rem;
+  color: #718096;
+  font-style: italic;
+  background: white;
+  margin: 1rem;
+  border-radius: 0.75rem;
+  border: 1px dashed #e2e8f0;
+}

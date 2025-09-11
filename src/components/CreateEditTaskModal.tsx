@@ -1,40 +1,16 @@
 import React, { useState, useEffect } from "react";
-import "../styles/theme.css";
-import {
-  saveTaskWithLevel,
-  type TaskItem,
-  type TaskChild,
-  LEVEL_LABELS,
-} from "../services/firestore";
-import { auth, db } from "../services/firebase";
+import { auth } from "../services/firebase";
+import { type TaskItem, saveTaskWithLevel } from "../services/firestore";
 import { toast } from "react-toastify";
-import CreateChildTaskModal from "./CreateChildTaskModal";
-import {
-  collection,
-  addDoc,
-  doc,
-  getDoc,
-  serverTimestamp,
-  updateDoc,
-} from "firebase/firestore";
-
-interface TempChildTask {
-  task_name: string;
-  task_detail: string;
-  user_id: string;
-  level?: number;
-  start_time?: Date | null;
-  end_time?: Date | null;
-  createdAt?: Date | null;
-}
+import "../styles/theme.css";
 
 interface Props {
   open: boolean;
   onClose: () => void;
-  edit: TaskItem | null;
+  edit?: TaskItem | null;
   onSaved: () => void;
-  defaultStart?: Date | null;
-  defaultEnd?: Date | null;
+  defaultStart?: Date;
+  defaultEnd?: Date;
 }
 
 const levels = [
@@ -58,12 +34,7 @@ const CreateEditTaskModal: React.FC<Props> = ({
   const [level, setLevel] = useState(3);
   const [startTime, setStartTime] = useState<string>("");
   const [endTime, setEndTime] = useState<string>("");
-  const [childTasks, setChildTasks] = useState<(TaskChild | TempChildTask)[]>(
-    []
-  );
-  const [showChildModal, setShowChildModal] = useState(false);
 
-  // Load dữ liệu khi edit
   useEffect(() => {
     if (edit) {
       setTaskName(edit.task_name);
@@ -86,60 +57,39 @@ const CreateEditTaskModal: React.FC<Props> = ({
     }
   }, [edit, defaultStart, defaultEnd]);
 
-  // Load child tasks
-  useEffect(() => {
-    const loadChildTasks = async () => {
-      if (edit?.task_child?.length) {
-        const children = await Promise.all(
-          edit.task_child.map(async (id) => {
-            const docRef = doc(db, "task_child", id);
-            const docSnap = await getDoc(docRef);
-            if (docSnap.exists()) {
-              const data = docSnap.data();
-              return {
-                id,
-                ...data,
-                start_time: data.start_time?.toDate(),
-                end_time: data.end_time?.toDate(),
-                createdAt: data.createdAt?.toDate(),
-              } as TaskChild;
-            }
-            return null;
-          })
-        );
-        setChildTasks(children.filter((c): c is TaskChild => c !== null));
-      } else {
-        setChildTasks([]);
-      }
-    };
+  // Thêm hàm validate
+  const validateDates = (start: string, end: string): string | null => {
+    const now = new Date();
+    const startDate = start ? new Date(start) : null;
 
-    if (edit) {
-      loadChildTasks();
-    } else {
-      setChildTasks([]);
+    if (!edit && startDate && startDate < now) {
+      return "Thời gian bắt đầu không thể trong quá khứ";
     }
-  }, [edit]);
 
-  if (!open) return null;
+    if (start && end && new Date(start) > new Date(end)) {
+      return "Thời gian bắt đầu phải trước thời gian kết thúc";
+    }
 
-  const handleChildSaved = (newChild: Omit<TaskChild, "id" | "parent_id">) => {
-    setChildTasks((current) => [...current, newChild]);
-    setShowChildModal(false);
+    return null;
   };
 
-  const handleRemoveChild = (index: number) => {
-    setChildTasks((tasks) => tasks.filter((_, i) => i !== index));
-    toast.success("Đã xóa công việc con");
-  };
-
+  // Sửa hàm handleSave
   const handleSave = async () => {
     const currentUser = auth.currentUser;
     if (!currentUser) {
       toast.error("Bạn chưa đăng nhập");
       return;
     }
+
     if (!taskName.trim()) {
-      toast.error("Tên lịch không được để trống");
+      toast.error("Tên công việc không được để trống");
+      return;
+    }
+
+    // Thêm validate dates
+    const dateError = validateDates(startTime, endTime);
+    if (dateError) {
+      toast.error(dateError);
       return;
     }
 
@@ -151,50 +101,10 @@ const CreateEditTaskModal: React.FC<Props> = ({
         start_time: startTime ? new Date(startTime) : null,
         end_time: endTime ? new Date(endTime) : null,
         level,
-        task_child: edit?.task_child || [],
         user_id: currentUser.uid,
       };
 
-      const mainTaskId = await saveTaskWithLevel(currentUser.uid, taskData);
-
-      // Process child tasks
-      const savedChildIds = await Promise.all(
-        childTasks.map(async (child) => {
-          if ("id" in child) {
-            // update existing child
-            await updateDoc(doc(db, "task_child", child.id), {
-              task_name: child.task_name,
-              task_detail: child.task_detail,
-              level: child.level,
-              start_time: child.start_time ? new Date(child.start_time) : null,
-              end_time: child.end_time ? new Date(child.end_time) : null,
-              updatedAt: serverTimestamp(),
-            });
-            return child.id;
-          } else {
-            // create new child
-            const childDoc = await addDoc(collection(db, "task_child"), {
-              task_name: child.task_name,
-              task_detail: child.task_detail,
-              level: child.level,
-              start_time: child.start_time ? new Date(child.start_time) : null,
-              end_time: child.end_time ? new Date(child.end_time) : null,
-              parent_id: mainTaskId,
-              user_id: auth.currentUser?.uid,
-              createdAt: new Date(),
-            });
-            return childDoc.id;
-          }
-        })
-      );
-
-      // Update main task with child IDs
-      if (savedChildIds.length > 0) {
-        await updateDoc(doc(db, "tasks", mainTaskId), {
-          task_child: savedChildIds,
-        });
-      }
-
+      await saveTaskWithLevel(currentUser.uid, taskData);
       toast.success(edit ? "Cập nhật thành công" : "Thêm mới thành công");
       onClose();
       onSaved();
@@ -204,65 +114,75 @@ const CreateEditTaskModal: React.FC<Props> = ({
     }
   };
 
+  if (!open) return null;
+
   return (
     <div className="modal-overlay animate-fadeIn">
       <div className="modal-box animate-slideIn">
         <div className="modal-header">
           <h2 className="modal-title">
-            {edit ? "Chỉnh sửa lịch" : "Thêm lịch mới"}
+            {edit ? "Chỉnh sửa công việc" : "Thêm công việc mới"}
           </h2>
           <button className="btn-close" onClick={onClose}>
             ×
           </button>
         </div>
 
-        {/* Form */}
         <div className="form-group">
-          <label>Tên lịch *</label>
+          <label htmlFor="taskName">Tên công việc:</label>
           <input
+            id="taskName"
             type="text"
             className="input"
             value={taskName}
             onChange={(e) => setTaskName(e.target.value)}
-            placeholder="Nhập tên lịch"
+            placeholder="Nhập tên công việc..."
           />
         </div>
+
         <div className="form-group">
-          <label>Chi tiết</label>
+          <label htmlFor="taskDetail">Chi tiết:</label>
           <textarea
+            id="taskDetail"
             className="input"
             value={taskDetail}
             onChange={(e) => setTaskDetail(e.target.value)}
-            placeholder="Nhập chi tiết công việc"
+            placeholder="Nhập chi tiết công việc..."
             rows={4}
           />
         </div>
+
         <div className="form-group">
-          <label>Mức độ</label>
+          <label htmlFor="level">Mức độ quan trọng:</label>
           <select
+            id="level"
             className="input"
             value={level}
             onChange={(e) => setLevel(Number(e.target.value))}
           >
-            {levels.map((lv) => (
-              <option key={lv.value} value={lv.value}>
-                {lv.label}
+            {levels.map((l) => (
+              <option key={l.value} value={l.value}>
+                {l.label}
               </option>
             ))}
           </select>
         </div>
+
         <div className="form-group">
-          <label>Bắt đầu</label>
+          <label htmlFor="startTime">Thời gian bắt đầu:</label>
           <input
+            id="startTime"
             type="datetime-local"
             className="input"
             value={startTime}
             onChange={(e) => setStartTime(e.target.value)}
           />
         </div>
+
         <div className="form-group">
-          <label>Kết thúc</label>
+          <label htmlFor="endTime">Thời gian kết thúc:</label>
           <input
+            id="endTime"
             type="datetime-local"
             className="input"
             value={endTime}
@@ -270,63 +190,15 @@ const CreateEditTaskModal: React.FC<Props> = ({
           />
         </div>
 
-        {/* Child tasks */}
-        <div className="child-tasks-section">
-          <div className="section-header">
-            <h3>Công việc con</h3>
-            <button
-              className="btn btn-add-child"
-              onClick={() => setShowChildModal(true)}
-            >
-              ➕ Thêm công việc con
-            </button>
-          </div>
-          <div className="child-tasks-list">
-            {childTasks.map((child, index) => (
-              <div
-                key={"id" in child ? child.id : index}
-                className="child-task-item"
-              >
-                <div className="child-info">
-                  <div className="child-header">
-                    <span className="child-name">{child.task_name}</span>
-                    <span className={`child-level level-${child.level}`}>
-                      {child.level
-                        ? LEVEL_LABELS[child.level]
-                        : "Chưa phân loại"}
-                    </span>
-                  </div>
-                  <div className="child-detail">{child.task_detail}</div>
-                </div>
-                <button
-                  className="btn-remove"
-                  onClick={() => handleRemoveChild(index)}
-                >
-                  🗑️
-                </button>
-              </div>
-            ))}
-          </div>
-        </div>
-
-        {/* Actions */}
         <div className="modal-actions">
           <button className="btn btn-secondary" onClick={onClose}>
-            Hủy
+            Huỷ
           </button>
           <button className="btn btn-primary" onClick={handleSave}>
             {edit ? "Cập nhật" : "Thêm"}
           </button>
         </div>
       </div>
-
-      <CreateChildTaskModal
-        open={showChildModal}
-        onClose={() => setShowChildModal(false)}
-        onSaved={handleChildSaved}
-        parentStartTime={startTime}
-        parentEndTime={endTime}
-      />
     </div>
   );
 };
