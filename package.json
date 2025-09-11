@@ -10,17 +10,21 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@material-ui/core": "^4.12.4",
-    "@material-ui/icons": "^4.11.3",
+    "@emotion/react": "^11.14.0",
+    "@emotion/styled": "^11.14.1",
+    "@mui/icons-material": "^7.3.2",
+    "@mui/material": "^7.3.2",
     "date-fns": "^4.1.0",
     "firebase": "^12.2.1",
     "framer-motion": "^12.23.12",
+    "lucide-react": "^0.543.0",
     "react": "^19.1.1",
     "react-big-calendar": "^1.19.4",
     "react-dom": "^19.1.1",
     "react-pageflip": "^2.0.3",
     "react-router-dom": "^7.8.2",
     "react-toastify": "^11.0.5",
+    "recharts": "^3.2.0",
     "turn.js": "^1.0.5"
   },
   "devDependencies": {
