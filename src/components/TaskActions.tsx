@@ -8,6 +8,7 @@ interface Props {
   onReload: () => void;
 }
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
 const TaskActions: React.FC<Props> = ({ onCreate, onReload }) => {
   const navigate = useNavigate();
   return (
@@ -15,9 +16,9 @@ const TaskActions: React.FC<Props> = ({ onCreate, onReload }) => {
       <button className="btn-primary" onClick={onCreate}>
         ➕ Thêm tasks
       </button>
-      <button className="btn-secondary" onClick={onReload}>
+      {/* <button className="btn-secondary" onClick={onReload}>
         🔄 Tải lại
-      </button>
+      </button> */}
       <button className="btn-calendar" onClick={() => navigate("/calendar")}>
         📅 Xem lịch
       </button>
@@ -26,6 +27,9 @@ const TaskActions: React.FC<Props> = ({ onCreate, onReload }) => {
       </button>
       <button className="btn-history" onClick={() => navigate("/history")}>
         📜 Lịch sử tasks
+      </button>
+      <button className="btn-analytics" onClick={() => navigate("/analytics")}>
+        📊 Phân tích dữ liệu
       </button>
     </div>
   );

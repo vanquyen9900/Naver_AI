@@ -170,9 +170,8 @@ const CalendarPage: React.FC = () => {
         displayName={auth.currentUser?.displayName || ""}
         photoURL={auth.currentUser?.photoURL || ""}
       />
-      <h2>📅 Lịch của bạn</h2>
+      <h1> 📅 Lịch của bạn</h1>
       <TaskActions onCreate={() => setModalOpen(true)} onReload={loadTasks} />
-
       <Calendar<CalendarEvent>
         localizer={localizer}
         events={events}
@@ -200,7 +199,6 @@ const CalendarPage: React.FC = () => {
         }}
         eventPropGetter={eventPropGetter}
       />
-
       <CreateEditTaskModal
         open={modalOpen}
         onClose={() => setModalOpen(false)}

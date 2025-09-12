@@ -1,0 +1,67 @@
+.analytics-overview {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 2rem;
+}
+
+.upcoming-deadlines,
+.important-tasks {
+  background: rgba(255, 255, 255, 0.9);
+  border-radius: 16px;
+  padding: 2rem;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+}
+
+h2 {
+  color: #1e293b;
+  margin-bottom: 1.5rem;
+  font-size: 1.5rem;
+  background: linear-gradient(135deg, #6366f1, #8b5cf6);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+.deadline-item,
+.important-item {
+  background: rgba(255, 255, 255, 0.8);
+  padding: 1.5rem;
+  border-radius: 12px;
+  margin-bottom: 1rem;
+  transition: all 0.3s ease;
+  border: 1px solid rgba(99, 102, 241, 0.1);
+}
+
+.task-info h3 {
+  color: #1e293b;
+  margin: 0;
+  font-size: 1.1rem;
+}
+
+.task-info p {
+  color: #64748b;
+  margin-top: 0.5rem;
+}
+
+.time-remaining {
+  background: linear-gradient(135deg, #f43f5e, #f59e0b);
+  color: white;
+  padding: 0.5rem 1rem;
+  border-radius: 20px;
+  font-weight: 500;
+}
+
+.progress-container {
+  height: 8px;
+  background: #e3f0e2;
+  border-radius: 4px;
+  overflow: hidden;
+  margin-top: 1rem;
+}
+
+.progress-bar {
+  background: linear-gradient(90deg, #6366f1, #8b5cf6);
+  height: 100%;
+  transition: width 0.3s ease;
+}

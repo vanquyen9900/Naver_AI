@@ -1,0 +1,42 @@
+.analytics-summary {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 2rem;
+  margin-bottom: 2rem;
+}
+
+.summary-card {
+  padding: 2rem;
+  border-radius: 16px;
+  color: rgb(40, 155, 139);
+  animation: fadeIn 0.5s ease-out;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 255, 255, 0.18);
+}
+
+.summary-card h3 {
+  margin: 0;
+  font-size: 1.1rem;
+  opacity: 0.9;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.summary-card .count {
+  font-size: 3rem;
+  font-weight: bold;
+  margin-top: 1rem;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.incomplete {
+  background: linear-gradient(135deg, #f43f5e, #ef4444);
+}
+
+.complete {
+  background: linear-gradient(135deg, #22c55e, #10b981);
+}
+
+.overdue {
+  background: linear-gradient(135deg, #f97316, #f59e0b);
+}

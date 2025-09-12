@@ -31,7 +31,7 @@ export const TASK_STATUS_COLORS: Record<TaskStatus, string> = {
   [TaskStatus.CANCELLED]: "#dc3545",
 };
 
-interface TaskProgress {
+export interface TaskProgress {
   task_id: string;
   task_status: TaskStatus;
   updated_at: Date;
