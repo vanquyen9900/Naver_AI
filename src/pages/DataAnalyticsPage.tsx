@@ -5,6 +5,7 @@ import {
   type AggregatedTask,
   getMultipleAggregatedTasks,
 } from "../services/task";
+import { isApiKeyConfigured, setApiKey as setGeminiApiKey, isFallbackMode } from "../services/gemini";
 import AnalyticsSummary from "../components/analytics/AnalyticsSummary";
 import AnalyticsOverview from "../components/analytics/AnalyticsOverview";
 import AnalyticsHabits from "../components/analytics/AnalyticsHabits";
@@ -12,6 +13,7 @@ import AnalyticsReport from "../components/analytics/AnalyticsReport";
 import AnalyticsProgress from "../components/analytics/AnalyticsProgress";
 import UserHeader from "../components/UserHeader";
 import TaskActions from "../components/TaskActions";
+import ApiKeyModal from "../components/ApiKeyModal";
 
 import "../styles/DataAnalytics.css";
 
@@ -21,8 +23,16 @@ const DataAnalyticsPage = () => {
   const [tasks, setTasks] = useState<AggregatedTask[]>([]);
   const [activeTab, setActiveTab] = useState<AnalyticsTab>("overview");
   const [loading, setLoading] = useState(true);
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [isModalOpen, setModalOpen] = useState(false);
+  const [isApiKeyModalOpen, setApiKeyModalOpen] = useState(false);
+  const [hasApiKey, setHasApiKey] = useState(false);
+  const [isInFallbackMode, setIsInFallbackMode] = useState(false);
+
+  // Check for API key on component mount
+  useEffect(() => {
+    setHasApiKey(isApiKeyConfigured() || isFallbackMode());
+    setIsInFallbackMode(isFallbackMode());
+  }, []);
 
   useEffect(() => {
     const fetchTasks = async () => {
@@ -64,6 +74,21 @@ const DataAnalyticsPage = () => {
     return () => unsubscribe();
   }, []);
 
+  const handleTabClick = (tab: AnalyticsTab) => {
+    if (tab === "habits" && !hasApiKey) {
+      setApiKeyModalOpen(true);
+      return;
+    }
+    setActiveTab(tab);
+  };
+
+  const handleApiKeySubmit = (apiKey: string) => {
+    setGeminiApiKey(apiKey);
+    setHasApiKey(true);
+    setIsInFallbackMode(apiKey === "FALLBACK_MODE");
+    setActiveTab("habits");
+  };
+
   if (loading) {
     return <div className="loading">Loading analytics...</div>;
   }
@@ -85,6 +110,25 @@ const DataAnalyticsPage = () => {
       case "overview":
         return <AnalyticsOverview tasks={tasks} />;
       case "habits":
+        if (!hasApiKey) {
+          return (
+            <div className="ai-setup-prompt">
+              <div className="setup-card">
+                <h2>🤖 AI-Powered Habits Analysis</h2>
+                <p>
+                  Unlock intelligent insights about your productivity patterns with Gemini AI.
+                  Get personalized recommendations based on your task completion data.
+                </p>
+                <button 
+                  onClick={() => setApiKeyModalOpen(true)}
+                  className="setup-ai-button"
+                >
+                  🔑 Setup Gemini AI
+                </button>
+              </div>
+            </div>
+          );
+        }
         return <AnalyticsHabits tasks={tasks} />;
       case "report":
         return <AnalyticsReport tasks={tasks} />;
@@ -92,6 +136,7 @@ const DataAnalyticsPage = () => {
         return <AnalyticsProgress tasks={tasks} />;
     }
   };
+
   const loadTasks = async () => {
     if (!auth.currentUser) return;
     const userTasks = await getTasksWithLevelsByUser(auth.currentUser.uid);
@@ -101,8 +146,8 @@ const DataAnalyticsPage = () => {
     setTasks(aggregatedTasks);
   };
 
-    return (
-      <div className="analytics-wrapper">
+  return (
+    <div className="analytics-wrapper">
       <div className="analytics-header-section">
         <div className="header-content">
           <TaskActions 
@@ -115,58 +160,63 @@ const DataAnalyticsPage = () => {
           />
         </div>
       </div>
-        
 
-        <div className="analytics-container">
-          <div className="analytics-header">
-            <h1>Data Analytics Dashboard</h1>
-            <p className="subtitle">
-              Track your task performance and productivity insights
-            </p>
-          </div>
+      <div className="analytics-container">
+        <div className="analytics-header">
+          <h1>Data Analytics Dashboard</h1>
+          <p className="subtitle">
+            Track your task performance and productivity insights
+          </p>
+        </div>
 
-          <AnalyticsSummary tasks={tasks} />
+        <AnalyticsSummary tasks={tasks} />
 
-          <div className="analytics-tabs">
-            <button
-              className={`tab ${activeTab === "overview" ? "active" : ""}`}
-              onClick={() => setActiveTab("overview")}
-            >
-              <span className="tab-icon">📊</span>
-              Overview
-            </button>
-            <button
-              className={`tab ${activeTab === "habits" ? "active" : ""}`}
-              onClick={() => setActiveTab("habits")}
-            >
-              <span className="tab-icon">🎯</span>
-              Habits
-            </button>
-            <button
-              className={`tab ${activeTab === "report" ? "active" : ""}`}
-              onClick={() => setActiveTab("report")}
-            >
-              <span className="tab-icon">📈</span>
-              Report
-            </button>
-            <button
-              className={`tab ${activeTab === "progress" ? "active" : ""}`}
-              onClick={() => setActiveTab("progress")}
-            >
-              <span className="tab-icon">✅</span>
-              Progress
-            </button>
-          </div>
+        <div className="analytics-tabs">
+          <button
+            className={`tab ${activeTab === "overview" ? "active" : ""}`}
+            onClick={() => handleTabClick("overview")}
+          >
+            <span className="tab-icon">📊</span>
+            Overview
+          </button>
+          <button
+            className={`tab ${activeTab === "habits" ? "active" : ""} ${!hasApiKey ? "requires-setup" : isInFallbackMode ? "fallback-mode" : ""}`}
+            onClick={() => handleTabClick("habits")}
+          >
+            <span className="tab-icon">🤖</span>
+            AI Habits
+            {!hasApiKey && <span className="setup-indicator">⚙️</span>}
+            {isInFallbackMode && <span className="fallback-indicator">📊</span>}
+          </button>
+          <button
+            className={`tab ${activeTab === "report" ? "active" : ""}`}
+            onClick={() => handleTabClick("report")}
+          >
+            <span className="tab-icon">📈</span>
+            Report
+          </button>
+          <button
+            className={`tab ${activeTab === "progress" ? "active" : ""}`}
+            onClick={() => handleTabClick("progress")}
+          >
+            <span className="tab-icon">✅</span>
+            Progress
+          </button>
+        </div>
 
-          <div className="analytics-content glass-effect">
-            {renderContent()}
-          </div>
+        <div className="analytics-content glass-effect">
+          {renderContent()}
         </div>
       </div>
-      
-    );
 
-
+      <ApiKeyModal
+        isOpen={isApiKeyModalOpen}
+        onClose={() => setApiKeyModalOpen(false)}
+        onApiKeySubmit={handleApiKeySubmit}
+        currentApiKey={hasApiKey ? "***configured***" : ""}
+      />
+    </div>
+  );
 };
 
 export default DataAnalyticsPage;

@@ -11,13 +11,15 @@ import {
 import { getFirestore } from "firebase/firestore";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyD43I6rC11KEGU-vrapYVKzO8rt44wSNng",
-  authDomain: "naverai-b5abc.firebaseapp.com",
-  projectId: "naverai-b5abc",
-  storageBucket: "naverai-b5abc.firebasestorage.app",
-  messagingSenderId: "67514673971",
-  appId: "1:67514673971:web:5c5c5c5c5c5c5c5c5c5c5c",
+  apiKey: "AIzaSyC7IJJW9Wcb9UtFbXk3q10DAVGF-7_sjgI",
+  authDomain: "naverai-hackathon.firebaseapp.com",
+  projectId: "naverai-hackathon",
+  storageBucket: "naverai-hackathon.firebasestorage.app",
+  messagingSenderId: "91763174370",
+  appId: "1:91763174370:web:eb23cd6486d42acf0aa7bb",
+  measurementId: "G-BRN1EW1ZXZ"
 };
+
 
 const app = !getApps().length ? initializeApp(firebaseConfig) : getApp();
 

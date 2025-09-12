@@ -135,6 +135,37 @@
   box-shadow: 0 4px 15px rgba(99, 102, 241, 0.3);
 }
 
+.tab.requires-setup {
+  position: relative;
+  background: linear-gradient(135deg, #f59e0b 0%, #d97706 100%);
+  color: white;
+}
+
+.tab.requires-setup:hover {
+  background: linear-gradient(135deg, #d97706 0%, #b45309 100%);
+}
+
+.tab.fallback-mode {
+  background: linear-gradient(135deg, #06b6d4 0%, #0891b2 100%);
+  color: white;
+}
+
+.tab.fallback-mode:hover {
+  background: linear-gradient(135deg, #0891b2 0%, #0e7490 100%);
+}
+
+.setup-indicator {
+  margin-left: 0.5rem;
+  font-size: 0.8rem;
+  opacity: 0.9;
+}
+
+.fallback-indicator {
+  margin-left: 0.5rem;
+  font-size: 0.8rem;
+  opacity: 0.9;
+}
+
 .tab-icon {
   font-size: 1.2rem;
 }
@@ -191,6 +222,60 @@
   font-size: 1.1rem;
 }
 
+/* AI Setup Prompt Styles */
+.ai-setup-prompt {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+  padding: 2rem;
+}
+
+.setup-card {
+  background: linear-gradient(135deg, #f8fafc 0%, #f1f5f9 100%);
+  border-radius: 20px;
+  padding: 3rem;
+  text-align: center;
+  border: 2px dashed #cbd5e1;
+  max-width: 500px;
+  width: 100%;
+}
+
+.setup-card h2 {
+  font-size: 2rem;
+  font-weight: 700;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 1rem;
+}
+
+.setup-card p {
+  font-size: 1.1rem;
+  color: #6b7280;
+  line-height: 1.6;
+  margin-bottom: 2rem;
+}
+
+.setup-ai-button {
+  padding: 1rem 2rem;
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  border: none;
+  border-radius: 12px;
+  font-size: 1.1rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.3);
+}
+
+.setup-ai-button:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 25px rgba(102, 126, 234, 0.4);
+}
+
 /* Responsive adjustments */
 @media (max-width: 768px) {
   .analytics-top-section {
@@ -210,8 +295,6 @@
     padding: 0.75rem 1rem;
   }
 }
-
-
 
 @keyframes fadeIn {
   from {
