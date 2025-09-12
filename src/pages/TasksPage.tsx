@@ -9,6 +9,7 @@ import {
 import CreateEditTaskModal from "../components/CreateEditTaskModal";
 import ConfirmModal from "../components/ConfirmModal";
 import TaskList from "../components/TaskList";
+import ChatBot from "../components/ChatBot";
 import { toast, ToastContainer } from "react-toastify";
 import { motion } from "framer-motion";
 import "react-toastify/dist/ReactToastify.css";
@@ -102,6 +103,9 @@ const TasksPage: React.FC = () => {
           <TaskList tasks={tasks} onEdit={handleEdit} />
         )}
       </div>
+
+      {/* ChatBot - floating assistant */}
+      <ChatBot />
 
       <CreateEditTaskModal
         open={modalOpen}

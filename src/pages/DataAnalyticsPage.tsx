@@ -18,6 +18,7 @@ import AnalyticsProgress from "../components/analytics/AnalyticsProgress";
 import UserHeader from "../components/UserHeader";
 import TaskActions from "../components/TaskActions";
 import ApiKeyModal from "../components/ApiKeyModal";
+import ChatBot from "../components/ChatBot";
 
 import "../styles/DataAnalytics.css";
 
@@ -218,6 +219,9 @@ const DataAnalyticsPage = () => {
 
         <div className="analytics-content glass-effect">{renderContent()}</div>
       </div>
+
+      {/* ChatBot - floating assistant for analytics insights */}
+      <ChatBot />
 
       <ApiKeyModal
         isOpen={isApiKeyModalOpen}
