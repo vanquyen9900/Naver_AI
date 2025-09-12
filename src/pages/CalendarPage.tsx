@@ -16,6 +16,7 @@ import CreateEditTaskModal from "../components/CreateEditTaskModal";
 import { toast } from "react-toastify";
 import UserHeader from "../components/UserHeader";
 import TaskActions from "../components/TaskActions";
+import { getMultipleTaskProgress, TaskStatus } from "../services/taskProgress";
 
 const localizer = momentLocalizer(moment);
 
@@ -35,8 +36,8 @@ interface EventProps {
 const CalendarPage: React.FC = () => {
   const [events, setEvents] = useState<CalendarEvent[]>([]);
   const [modalOpen, setModalOpen] = useState(false);
-  const [defaultStart, setDefaultStart] = useState<Date | null>(null);
-  const [defaultEnd, setDefaultEnd] = useState<Date | null>(null);
+  const [defaultStart, setDefaultStart] = useState<Date | undefined>(undefined);
+  const [defaultEnd, setDefaultEnd] = useState<Date | undefined>(undefined);
   const [currentView, setCurrentView] = useState<View>(Views.MONTH);
   const [currentDate, setCurrentDate] = useState<Date>(new Date());
 
@@ -44,14 +45,33 @@ const CalendarPage: React.FC = () => {
     if (!auth.currentUser) return;
     try {
       const tasks = await getTasksWithLevelsByUser(auth.currentUser.uid);
-      const calendarEvents = tasks.map((task) => ({
-        id: task.id,
-        title: task.task_name,
-        start: task.start_time ?? new Date(),
-        end: task.end_time ?? new Date(),
-        allDay: false,
-        level: task.level,
-      }));
+
+      // Lấy progress của tất cả tasks
+      const taskProgressMap = await getMultipleTaskProgress(
+        tasks.map((task) => task.id)
+      );
+
+      const calendarEvents = tasks
+        .filter((task) => {
+          // Kiểm tra status từ taskProgress
+          const progress = taskProgressMap[task.id];
+          const status = progress?.task_status;
+
+          // Chỉ hiện những task chưa hoàn thành và chưa bị hủy
+          return (
+            !status || // Hiện cả task chưa có status
+            (status !== TaskStatus.COMPLETED && status !== TaskStatus.CANCELLED)
+          );
+        })
+        .map((task) => ({
+          id: task.id,
+          title: task.task_name,
+          start: task.start_time ?? new Date(),
+          end: task.end_time ?? new Date(),
+          allDay: false,
+          level: task.level,
+        }));
+
       setEvents(calendarEvents);
     } catch (error) {
       console.error("Failed to load tasks:", error);
@@ -64,9 +84,28 @@ const CalendarPage: React.FC = () => {
   }, [loadTasks]);
 
   const handleSelectSlot = useCallback((slotInfo: SlotInfo) => {
-    setDefaultStart(slotInfo.start as Date);
-    setDefaultEnd(slotInfo.end as Date);
-    setModalOpen(true);
+    try {
+      const startDate = new Date(slotInfo.start);
+      const endDate = new Date(slotInfo.end);
+
+      // Điều chỉnh thời gian kết thúc nếu là cùng ngày
+      if (endDate.getHours() === 0 && endDate.getMinutes() === 0) {
+        endDate.setHours(23);
+        endDate.setMinutes(59);
+      }
+
+      console.log("Selected time range:", {
+        start: startDate,
+        end: endDate,
+      });
+
+      setDefaultStart(startDate);
+      setDefaultEnd(endDate);
+      setModalOpen(true);
+    } catch (error) {
+      console.error("Error handling slot selection:", error);
+      toast.error("Có lỗi khi chọn thời gian");
+    }
   }, []);
 
   const levelColors: Record<number, string> = {
@@ -163,11 +202,20 @@ const CalendarPage: React.FC = () => {
       />
       <CreateEditTaskModal
         open={modalOpen}
-        onClose={() => setModalOpen(false)}
+        onClose={() => {
+          setModalOpen(false);
+          setDefaultStart(undefined);
+          setDefaultEnd(undefined);
+        }}
         edit={null}
-        onSaved={loadTasks}
-        defaultStart={defaultStart ?? undefined}
-        defaultEnd={defaultEnd ?? undefined}
+        onSaved={() => {
+          loadTasks();
+          setModalOpen(false);
+          setDefaultStart(undefined);
+          setDefaultEnd(undefined);
+        }}
+        defaultStart={defaultStart}
+        defaultEnd={defaultEnd}
       />
     </div>
   );

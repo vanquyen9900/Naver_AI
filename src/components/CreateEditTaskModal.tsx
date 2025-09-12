@@ -52,8 +52,12 @@ const CreateEditTaskModal: React.FC<Props> = ({
       setTaskName("");
       setTaskDetail("");
       setLevel(3);
-      setStartTime(defaultStart ? defaultStart.toISOString().slice(0, 16) : "");
-      setEndTime(defaultEnd ? defaultEnd.toISOString().slice(0, 16) : "");
+      if (defaultStart) {
+        setStartTime(new Date(defaultStart).toISOString().slice(0, 16));
+      }
+      if (defaultEnd) {
+        setEndTime(new Date(defaultEnd).toISOString().slice(0, 16));
+      }
     }
   }, [edit, defaultStart, defaultEnd]);
 

@@ -5,7 +5,11 @@ import {
   type AggregatedTask,
   getMultipleAggregatedTasks,
 } from "../services/task";
-import { isApiKeyConfigured, setApiKey as setGeminiApiKey, isFallbackMode } from "../services/gemini";
+import {
+  isApiKeyConfigured,
+  setApiKey as setGeminiApiKey,
+  isFallbackMode,
+} from "../services/gemini";
 import AnalyticsSummary from "../components/analytics/AnalyticsSummary";
 import AnalyticsOverview from "../components/analytics/AnalyticsOverview";
 import AnalyticsHabits from "../components/analytics/AnalyticsHabits";
@@ -23,6 +27,7 @@ const DataAnalyticsPage = () => {
   const [tasks, setTasks] = useState<AggregatedTask[]>([]);
   const [activeTab, setActiveTab] = useState<AnalyticsTab>("overview");
   const [loading, setLoading] = useState(true);
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   const [isModalOpen, setModalOpen] = useState(false);
   const [isApiKeyModalOpen, setApiKeyModalOpen] = useState(false);
   const [hasApiKey, setHasApiKey] = useState(false);
@@ -116,10 +121,11 @@ const DataAnalyticsPage = () => {
               <div className="setup-card">
                 <h2>🤖 AI-Powered Habits Analysis</h2>
                 <p>
-                  Unlock intelligent insights about your productivity patterns with Gemini AI.
-                  Get personalized recommendations based on your task completion data.
+                  Unlock intelligent insights about your productivity patterns
+                  with Gemini AI. Get personalized recommendations based on your
+                  task completion data.
                 </p>
-                <button 
+                <button
                   onClick={() => setApiKeyModalOpen(true)}
                   className="setup-ai-button"
                 >
@@ -150,9 +156,9 @@ const DataAnalyticsPage = () => {
     <div className="analytics-wrapper">
       <div className="analytics-header-section">
         <div className="header-content">
-          <TaskActions 
-            onCreate={() => setModalOpen(true)} 
-            onReload={loadTasks} 
+          <TaskActions
+            onCreate={() => setModalOpen(true)}
+            onReload={loadTasks}
           />
           <UserHeader
             displayName={auth.currentUser?.displayName}
@@ -180,7 +186,13 @@ const DataAnalyticsPage = () => {
             Overview
           </button>
           <button
-            className={`tab ${activeTab === "habits" ? "active" : ""} ${!hasApiKey ? "requires-setup" : isInFallbackMode ? "fallback-mode" : ""}`}
+            className={`tab ${activeTab === "habits" ? "active" : ""} ${
+              !hasApiKey
+                ? "requires-setup"
+                : isInFallbackMode
+                ? "fallback-mode"
+                : ""
+            }`}
             onClick={() => handleTabClick("habits")}
           >
             <span className="tab-icon">🤖</span>
@@ -204,9 +216,7 @@ const DataAnalyticsPage = () => {
           </button>
         </div>
 
-        <div className="analytics-content glass-effect">
-          {renderContent()}
-        </div>
+        <div className="analytics-content glass-effect">{renderContent()}</div>
       </div>
 
       <ApiKeyModal

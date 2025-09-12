@@ -46,6 +46,7 @@ const AnalyticsReport = ({ tasks }: Props) => {
   const [yearlyStats, setYearlyStats] = useState<TimeFrameStats>();
   const [taskTrends, setTaskTrends] = useState<TaskTrend[]>([]);
   const [weeklyWorkload, setWeeklyWorkload] = useState<WeeklyWorkload[]>([]);
+  const [todayStats, setTodayStats] = useState<TimeFrameStats>();
 
   useEffect(() => {
     console.log("Input tasks:", tasks);
@@ -69,6 +70,20 @@ const AnalyticsReport = ({ tasks }: Props) => {
           ? Math.round((completed / filteredTasks.length) * 100)
           : 0,
       };
+    };
+
+    const calculateTodayStats = () => {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+
+      const todayTasks = parentTasks.filter((task) => {
+        if (!task.startTime) return false;
+        const taskDate = new Date(task.startTime);
+        taskDate.setHours(0, 0, 0, 0);
+        return taskDate.getTime() === today.getTime();
+      });
+
+      setTodayStats(calculateStats(todayTasks));
     };
 
     // Weekly Workload - Sử dụng updatedAt và status
@@ -224,6 +239,7 @@ const AnalyticsReport = ({ tasks }: Props) => {
     calculateWeeklyStats();
     calculateMonthlyStats();
     calculateTaskTrends();
+    calculateTodayStats();
   }, [tasks]);
 
   return (
@@ -269,19 +285,19 @@ const AnalyticsReport = ({ tasks }: Props) => {
 
         {/* Yearly Overview Card */}
         <div className="summary-card">
-          <h3>Yearly Overview</h3>
+          <h3>Today's Overview</h3>
           <div className="stat-grid">
             <div className="stat">
               <span>Total</span>
-              <strong>{yearlyStats?.total}</strong>
+              <strong>{todayStats?.total}</strong>
             </div>
             <div className="stat">
               <span>Completed</span>
-              <strong className="completed">{yearlyStats?.completed}</strong>
+              <strong className="completed">{todayStats?.completed}</strong>
             </div>
             <div className="stat">
               <span>Success Rate</span>
-              <strong>{yearlyStats?.percentage}%</strong>
+              <strong>{todayStats?.percentage}%</strong>
             </div>
           </div>
         </div>

@@ -88,7 +88,7 @@ const TaskList: React.FC<Props> = ({ tasks, onEdit }) => {
             taskStatuses[task.id] !== TaskStatus.COMPLETED
         )
         .sort((a, b) => {
-          if (a.level !== b.level) return (a.level || 5) - (b.level || 5);
+          if (a.level !== b.level) return (a.level || 5 ) - (b.level || 5);
           return (
             (a.end_time?.getTime() || Infinity) -
             (b.end_time?.getTime() || Infinity)

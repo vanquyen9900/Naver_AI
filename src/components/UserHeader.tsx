@@ -3,6 +3,7 @@ import React from "react";
 import { auth } from "../services/firebase";
 import { toast } from "react-toastify";
 import "../styles/TaskPage.css";
+import { useNavigate } from "react-router-dom";
 
 interface Props {
   displayName?: string | null;
@@ -10,8 +11,10 @@ interface Props {
 }
 
 const UserHeader: React.FC<Props> = ({ displayName, photoURL }) => {
+  const navigate = useNavigate();
   const handleLogout = async () => {
     await auth.signOut();
+    await navigate("/");
     toast.info("Đã đăng xuất!");
   };
 
