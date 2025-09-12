@@ -82,7 +82,11 @@ const TaskList: React.FC<Props> = ({ tasks, onEdit }) => {
   const sortedTasks = useMemo(
     () =>
       tasks
-        .filter((task) => taskStatuses[task.id] !== TaskStatus.CANCELLED)
+        .filter(
+          (task) =>
+            taskStatuses[task.id] !== TaskStatus.CANCELLED &&
+            taskStatuses[task.id] !== TaskStatus.COMPLETED
+        )
         .sort((a, b) => {
           if (a.level !== b.level) return (a.level || 5) - (b.level || 5);
           return (
@@ -92,6 +96,10 @@ const TaskList: React.FC<Props> = ({ tasks, onEdit }) => {
         }),
     [tasks, taskStatuses]
   );
+
+  const isTaskOverdue = (task: TaskItem): boolean => {
+    return task.end_time ? new Date() > new Date(task.end_time) : false;
+  };
 
   const TaskCard = useCallback(
     ({ task }: { task: TaskItem }) => (
@@ -109,7 +117,11 @@ const TaskList: React.FC<Props> = ({ tasks, onEdit }) => {
             backgroundColor: getStatusColor(taskStatuses[task.id]),
           }}
         >
-          {TASK_STATUS_LABELS[taskStatuses[task.id] || TaskStatus.NOT_STARTED]}
+          {taskStatuses[task.id] !== TaskStatus.COMPLETED && isTaskOverdue(task)
+            ? "Quá hạn"
+            : TASK_STATUS_LABELS[
+                taskStatuses[task.id] || TaskStatus.NOT_STARTED
+              ]}
         </div>
 
         <div className="task-header">

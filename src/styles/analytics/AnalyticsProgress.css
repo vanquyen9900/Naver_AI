@@ -1,85 +1,202 @@
+:root {
+  --primary-gradient: linear-gradient(135deg, #6366f1, #8b5cf6);
+  --secondary-gradient: linear-gradient(135deg, #3b82f6, #2dd4bf);
+  --success-gradient: linear-gradient(135deg, #22c55e, #10b981);
+  --warning-gradient: linear-gradient(135deg, #f59e0b, #fbbf24);
+  --danger-gradient: linear-gradient(135deg, #ef4444, #f87171);
+  --glass-bg: rgba(255, 255, 255, 0.95);
+  --glass-border: rgba(255, 255, 255, 0.18);
+  --shadow-sm: 0 4px 6px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 8px 32px rgba(0, 0, 0, 0.1);
+}
+
 .analytics-progress {
   padding: 1.5rem;
+  animation: fadeIn 0.5s ease-out;
 }
 
-.progress-list {
-  display: flex;
-  flex-direction: column;
-  gap: 1.5rem;
-}
-
-.task-item {
-  background: rgba(255, 255, 255, 0.9);
+.progress-table-container {
+  background: var(--glass-bg);
   border-radius: 16px;
-  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+  box-shadow: var(--shadow-md);
+  border: 1px solid var(--glass-border);
+  backdrop-filter: blur(10px);
   overflow: hidden;
-  border: 1px solid rgba(255, 255, 255, 0.18);
 }
 
-.task-header {
-  padding: 1.5rem;
-  background: rgba(255, 255, 255, 0.8);
+.progress-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.95rem;
+}
+
+.progress-table th {
+  background: rgba(241, 245, 249, 0.8);
+  color: #1e293b;
+  font-weight: 600;
+  text-align: left;
+  padding: 1rem;
+  border-bottom: 2px solid rgba(226, 232, 240, 0.8);
+}
+
+.task-row {
   cursor: pointer;
-  transition: all 0.3s ease;
-  border-bottom: 1px solid rgba(99, 102, 241, 0.1);
+  transition: background-color 0.2s ease;
 }
 
-.task-info {
+.task-row:hover {
+  background: rgba(241, 245, 249, 0.5);
+}
+
+.subtask-row {
+  background: rgba(241, 245, 249, 0.2);
+  font-size: 0.9rem;
+}
+
+.task-row td,
+.subtask-row td {
+  padding: 1rem;
+  border-bottom: 1px solid rgba(226, 232, 240, 0.5);
+}
+
+.task-name {
+  font-weight: 500;
+  color: #1e293b;
   display: flex;
   align-items: center;
-  gap: 1rem;
+  gap: 0.5rem;
 }
 
-.task-info h3 {
-  color: #1e293b;
-  margin: 0;
-  font-size: 1.1rem;
+.subtask-name {
+  padding-left: 2rem !important;
+  color: #64748b;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
 }
 
-.level-badge {
-  background: linear-gradient(135deg, #6366f1, #8b5cf6);
-  color: white;
-  padding: 0.3rem 0.8rem;
-  border-radius: 20px;
+.subtask-indent {
+  color: #94a3b8;
+  font-family: monospace;
+}
+
+.expand-icon {
+  color: #6366f1;
   font-size: 0.8rem;
+  transition: transform 0.3s ease;
+}
+
+.expand-icon.expanded {
+  transform: rotate(90deg);
+}
+
+.task-detail {
+  color: #64748b;
+  max-width: 300px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.task-deadline {
+  color: #64748b;
+  white-space: nowrap;
 }
 
 .progress-bar-container {
   height: 8px;
-  background: #e2e8f0;
+  background: rgba(226, 232, 240, 0.5);
   border-radius: 4px;
   overflow: hidden;
+  width: 150px;
 }
 
 .progress-bar {
-  background: linear-gradient(90deg, #22c55e, #10b981);
   height: 100%;
-  transition: width 0.3s ease;
-  color: transparent;
-  font-size: 0;
-}
-
-.subtasks {
-  padding: 1.5rem;
-  background: rgba(241, 245, 249, 0.5);
-}
-
-.subtask-item {
-  background: white;
-  padding: 1rem 1.5rem;
-  border-radius: 12px;
-  margin-bottom: 1rem;
-  border: 1px solid rgba(99, 102, 241, 0.1);
+  transition: width 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.75rem;
+  color: white;
+  font-weight: 600;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+  min-width: 24px;
 }
 
 .status-badge {
-  padding: 0.25rem 0.75rem;
-  border-radius: 20px;
+  padding: 0.3rem 0.6rem;
+  border-radius: 12px;
   font-size: 0.8rem;
   color: white;
-  background: linear-gradient(135deg, #6366f1, #8b5cf6);
+  font-weight: 500;
+  white-space: nowrap;
 }
 
 .status-badge.completed {
-  background: linear-gradient(135deg, #22c55e, #10b981);
+  background: var(--success-gradient);
+}
+
+.status-badge.in-progress {
+  background: var(--warning-gradient);
+}
+
+.priority-badge {
+  padding: 0.3rem 0.6rem;
+  border-radius: 12px;
+  font-size: 0.8rem;
+  font-weight: 500;
+  white-space: nowrap;
+}
+
+.priority-badge.level-1 {
+  background: var(--danger-gradient);
+  color: white;
+}
+
+.priority-badge.level-2 {
+  background: var(--warning-gradient);
+  color: white;
+}
+
+.priority-badge.level-3 {
+  background: var(--primary-gradient);
+  color: white;
+}
+
+.priority-badge.level-normal {
+  background: rgba(203, 213, 225, 0.3);
+  color: #64748b;
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+@media (max-width: 768px) {
+  .analytics-progress {
+    padding: 1rem;
+  }
+
+  .task-detail {
+    max-width: 150px;
+  }
+
+  .progress-bar-container {
+    width: 100px;
+  }
+
+  .status-badge,
+  .priority-badge {
+    padding: 0.2rem 0.4rem;
+    font-size: 0.75rem;
+  }
 }

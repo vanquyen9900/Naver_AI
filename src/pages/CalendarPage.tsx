@@ -118,51 +118,13 @@ const CalendarPage: React.FC = () => {
     [currentDate, isFullDayEvent, levelColors]
   );
 
-  const EventComponent = useCallback(
-    ({ event }: EventProps) => {
-      const currentDateMoment = moment(currentDate);
-      const isFullDay = isFullDayEvent(event);
-      const isStart = currentDateMoment.isSame(event.start, "day");
-      const isEnd = currentDateMoment.isSame(event.end, "day");
-      const isMiddleDay =
-        !isStart &&
-        !isEnd &&
-        currentDateMoment.isBetween(event.start, event.end, "day", "[]");
-
-      if (isFullDay) {
-        return (
-          <div className="event-content full-day">
-            <span className="event-title">{event.title}</span>
-          </div>
-        );
-      }
-
-      if (isMiddleDay) {
-        return (
-          <div className="event-content middle-day">
-            <span className="event-title">{event.title}</span>
-          </div>
-        );
-      }
-
-      return (
-        <div className="event-content">
-          {isStart && (
-            <div className="event-time start-time">
-              {moment(event.start).format("HH:mm")}
-            </div>
-          )}
-          <span className="event-title">{event.title}</span>
-          {isEnd && (
-            <div className="event-time end-time">
-              {moment(event.end).format("HH:mm")}
-            </div>
-          )}
-        </div>
-      );
-    },
-    [currentDate, isFullDayEvent]
-  );
+  const EventComponent = useCallback(({ event }: EventProps) => {
+    return (
+      <div className="event-content">
+        <span className="event-title">{event.title}</span>
+      </div>
+    );
+  }, []);
 
   return (
     <div className="calendar-container">

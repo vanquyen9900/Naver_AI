@@ -19,6 +19,7 @@ export interface AggregatedTaskProgress {
   statusLabel: string;
   statusColor: string;
   updatedAt: Date;
+  completedAt?: Date;
 }
 
 export interface AggregatedTask {
@@ -51,11 +52,27 @@ const mapTaskProgress = (
 ): AggregatedTaskProgress | undefined => {
   if (!progress) return undefined;
 
+  // Convert timestamp to Date object
+  const updatedAt =
+    progress.updated_at instanceof Date
+      ? progress.updated_at
+      : new Date(progress.updated_at);
+
+  // Handle completedAt
+  let completedAt: Date | undefined = undefined;
+  if (progress.task_status === TaskStatus.COMPLETED) {
+    completedAt =
+      progress.updated_at instanceof Date
+        ? progress.updated_at
+        : new Date(progress.updated_at);
+  }
+
   return {
     status: progress.task_status,
     statusLabel: TASK_STATUS_LABELS[progress.task_status],
     statusColor: TASK_STATUS_COLORS[progress.task_status],
-    updatedAt: progress.updated_at,
+    updatedAt,
+    completedAt,
   };
 };
 
@@ -127,4 +144,24 @@ export const getMultipleAggregatedTasks = async (
 ): Promise<AggregatedTask[]> => {
   const tasks = await Promise.all(taskIds.map((id) => getAggregatedTask(id)));
   return tasks.filter((t): t is AggregatedTask => t !== null);
+};
+
+export const calculateTaskProgress = (task: AggregatedTask): number => {
+  // First check parent task status
+  if (task.progress?.status === TaskStatus.COMPLETED) {
+    return 100;
+  }
+
+  // If parent task is not completed and has no children, return 0
+  if (!task.children || task.children.length === 0 || task.children === null) {
+    return 0;
+  } else {
+    // Calculate progress based on children only if parent is not completed
+    const totalChildren = task.children.length;
+    const completedChildren = task.children.filter(
+      (child) => child.progress?.status === TaskStatus.COMPLETED
+    ).length;
+
+    return Math.round((completedChildren / totalChildren) * 100);
+  }
 };

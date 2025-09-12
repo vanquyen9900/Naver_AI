@@ -15,19 +15,104 @@
 
 /* ====== CALENDAR CHUNG ====== */
 .rbc-calendar {
-  border-radius: 12px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  background: #fff;
+  min-height: 600px;
 }
 
-/* ====== EVENT CHUNG (month/week/day) ====== */
+.rbc-month-view {
+  flex: 1;
+}
+
+.rbc-month-row {
+  min-height: 100px;
+}
+
+/* Event styling */
 .rbc-event {
-  border: none;
-  border-radius: 6px;
-  color: #fff;
-  font-weight: 500;
-  padding: 4px 6px;
+  padding: 2px 3px !important;
+  font-size: 0.8rem !important;
+  margin: 1px 0 !important;
+  min-height: 20px !important;
+  height: auto !important;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  border-radius: 3px !important;
+}
+
+/* Container for events */
+.rbc-events-container {
+  margin-right: 0 !important;
+}
+
+/* Day cell styling */
+.rbc-day-bg {
+  transition: background-color 0.2s;
+}
+
+.rbc-date-cell {
+  padding: 2px 4px !important;
+  text-align: right;
   font-size: 0.85rem;
+}
+
+/* More link styling */
+.rbc-show-more {
+  background-color: transparent !important;
+  color: #3498db !important;
+  font-size: 0.8rem;
+  padding: 1px 3px !important;
+  font-weight: bold;
+}
+
+/* Event content */
+.event-content {
+  width: 100%;
+  display: flex;
+  align-items: center;
+}
+
+.event-title {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  font-size: 0.8rem;
+  line-height: 1.2;
+}
+
+/* Popup styling */
+.rbc-overlay {
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+  padding: 8px;
+  z-index: 1000;
+}
+
+.rbc-overlay-header {
+  font-size: 0.9rem;
+  padding: 4px 8px;
+  border-bottom: 1px solid #eee;
+  margin-bottom: 4px;
+}
+
+/* Make sure popover stays on top */
+.rbc-overlay {
+  z-index: 1000;
+}
+
+/* Improve "more" events display */
+.rbc-row-segment {
+  padding: 0 1px !important;
+}
+
+.rbc-show-more {
+  margin: 0 !important;
+}
+
+/* Remove time display from event title */
+.event-time {
+  display: none !important;
 }
 
 /* ====== TODAY CELL ====== */
@@ -112,4 +197,21 @@
 .rbc-agenda-event-cell {
   font-weight: 500;
   color: #333;
+}
+
+/* Responsive adjustments */
+@media screen and (max-width: 768px) {
+  .rbc-calendar {
+    min-height: 500px;
+  }
+
+  .rbc-month-row {
+    min-height: 80px;
+  }
+
+  .rbc-event {
+    font-size: 0.75rem !important;
+    padding: 1px 2px !important;
+    min-height: 18px !important;
+  }
 }

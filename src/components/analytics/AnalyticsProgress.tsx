@@ -1,6 +1,6 @@
 import { useState } from "react";
-import type { AggregatedTask } from "../../services/task";
 import { TaskStatus } from "../../services/taskProgress";
+import type { AggregatedTask } from "../../services/task";
 import "../../styles/analytics/AnalyticsProgress.css";
 
 interface Props {
@@ -21,86 +21,136 @@ const AnalyticsProgress = ({ tasks }: Props) => {
   };
 
   const calculateProgress = (task: AggregatedTask): number => {
-    if (!task.children?.length) {
-      return task.progress?.status === TaskStatus.COMPLETED ? 100 : 0;
+    if (task.progress?.status === TaskStatus.COMPLETED) {
+      return 100;
     }
 
+    if (!task.children || task.children.length === 0) {
+      return 0;
+    }
+
+    const totalChildren = task.children.length;
     const completedChildren = task.children.filter(
       (child) => child.progress?.status === TaskStatus.COMPLETED
     ).length;
 
-    return Math.round((completedChildren / task.children.length) * 100);
+    return Math.round((completedChildren / totalChildren) * 100);
+  };
+
+  const formatEndTime = (date: Date | undefined): string => {
+    if (!date) return "No deadline";
+    return date.toLocaleDateString("en-US", {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+    });
   };
 
   return (
     <div className="analytics-progress">
-      <div className="progress-list">
-        {tasks.map((task) => (
-          <div key={task.id} className="task-item">
-            <div className="task-header" onClick={() => toggleTask(task.id)}>
-              <div className="task-info">
-                <span
-                  className={`expand-icon ${
-                    expandedTasks.has(task.id) ? "expanded" : ""
-                  }`}
+      <div className="progress-table-container">
+        <table className="progress-table">
+          <thead>
+            <tr>
+              <th>Name</th>
+              <th>Detail</th>
+              <th>End Time</th>
+              <th>Progress</th>
+              <th>Priority</th>
+            </tr>
+          </thead>
+          <tbody>
+            {tasks.map((task) => (
+              <>
+                <tr
+                  key={task.id}
+                  className="task-row"
+                  onClick={() => toggleTask(task.id)}
                 >
-                  ▶
-                </span>
-                <h3>{task.taskName}</h3>
-                <span className="level-badge">Level {task.level}</span>
-              </div>
-
-              <div className="progress-bar-container">
-                <div
-                  className="progress-bar"
-                  style={{ width: `${calculateProgress(task)}%` }}
-                >
-                  {calculateProgress(task)}%
-                </div>
-              </div>
-            </div>
-
-            {expandedTasks.has(task.id) && task.children && (
-              <div className="subtasks">
-                {task.children.map((child) => (
-                  <div key={child.id} className="subtask-item">
-                    <div className="subtask-info">
-                      <h4>{child.taskName}</h4>
-                      <span
-                        className="status-badge"
-                        style={{
-                          backgroundColor:
-                            child.progress?.status === TaskStatus.COMPLETED
-                              ? "#00b894"
-                              : "#ffc107",
-                        }}
-                      >
-                        {child.progress?.status === TaskStatus.COMPLETED
-                          ? "Completed"
-                          : "In Progress"}
-                      </span>
-                    </div>
+                  <td className="task-name">
+                    <span
+                      className={`expand-icon ${
+                        expandedTasks.has(task.id) ? "expanded" : ""
+                      }`}
+                    >
+                      ▶
+                    </span>
+                    {task?.taskName}
+                  </td>
+                  <td className="task-detail">{task.taskDetail || "-"}</td>
+                  <td className="task-deadline">
+                    {formatEndTime(task?.endTime ?? undefined)}
+                  </td>
+                  <td className="task-progress">
                     <div className="progress-bar-container">
                       <div
                         className="progress-bar"
                         style={{
-                          width:
-                            child.progress?.status === TaskStatus.COMPLETED
-                              ? "100%"
-                              : "0%",
+                          width: `${calculateProgress(task)}%`,
+                          background:
+                            task.progress?.status === TaskStatus.COMPLETED
+                              ? "var(--success-gradient)"
+                              : "var(--primary-gradient)",
                         }}
                       >
-                        {child.progress?.status === TaskStatus.COMPLETED
-                          ? "100%"
-                          : "0%"}
+                        {calculateProgress(task)}%
                       </div>
                     </div>
-                  </div>
-                ))}
-              </div>
-            )}
-          </div>
-        ))}
+                  </td>
+                  <td className="task-priority">
+                    <span
+                      className={`priority-badge level-${
+                        task.level || "normal"
+                      }`}
+                    >
+                      {task.level || "Normal"}
+                    </span>
+                  </td>
+                </tr>
+                {expandedTasks.has(task.id) && task.children && (
+                  <>
+                    {task.children.map((child) => (
+                      <tr key={child.id} className="subtask-row">
+                        <td className="subtask-name">
+                          <span className="subtask-indent">└─</span>
+                          {child.taskName}
+                        </td>
+                        <td className="task-detail">
+                          {child.taskDetail || "-"}
+                        </td>
+                        <td className="task-deadline">
+                          {formatEndTime(child.endTime ?? undefined)}
+                        </td>
+                        <td className="task-progress">
+                          <span
+                            className={`status-badge ${
+                              child.progress?.status === TaskStatus.COMPLETED
+                                ? "completed"
+                                : "in-progress"
+                            }`}
+                          >
+                            {child.progress?.status === TaskStatus.COMPLETED
+                              ? "Completed"
+                              : "In Progress"}
+                          </span>
+                        </td>
+                        <td className="task-priority">
+                          <span
+                            className={`priority-badge level-${
+                              child.level || "normal"
+                            }`}
+                          >
+                            {child.level || "Normal"}
+                          </span>
+                        </td>
+                      </tr>
+                    ))}
+                  </>
+                )}
+              </>
+            ))}
+          </tbody>
+        </table>
       </div>
     </div>
   );
