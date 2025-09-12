@@ -9,6 +9,7 @@ import {
   getDocs,
 } from "firebase/firestore";
 
+/** Status enum */
 export const TaskStatus = {
   NOT_STARTED: 1,
   IN_PROGRESS: 2,
@@ -31,12 +32,26 @@ export const TASK_STATUS_COLORS: Record<TaskStatus, string> = {
   [TaskStatus.CANCELLED]: "#dc3545",
 };
 
+/** Giống như start_time/end_time: luôn là Date */
 export interface TaskProgress {
   task_id: string;
   task_status: TaskStatus;
   updated_at: Date;
 }
 
+/** --- Helper --- */
+const normalizeDate = (d: unknown): Date => {
+  if (!d && d !== 0) return new Date(); // fallback hiện tại
+  if (d instanceof Date) return d;
+  // Firestore Timestamp
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  if (typeof (d as any)?.toDate === "function") return (d as any).toDate();
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  const parsed = new Date(d as any);
+  return isNaN(parsed.getTime()) ? new Date() : parsed;
+};
+
+/** --- CRUD --- */
 export const updateTaskProgress = async (
   taskId: string,
   status: TaskStatus
@@ -45,7 +60,7 @@ export const updateTaskProgress = async (
   await setDoc(progressRef, {
     task_id: taskId,
     task_status: status,
-    updated_at: new Date(),
+    updated_at: new Date(), // lưu thẳng Date
   });
 };
 
@@ -55,7 +70,12 @@ export const getTaskProgress = async (
   const progressRef = doc(db, "task_progress", taskId);
   const snap = await getDoc(progressRef);
   if (!snap.exists()) return null;
-  return snap.data() as TaskProgress;
+  const data = snap.data();
+  return {
+    task_id: data.task_id,
+    task_status: data.task_status,
+    updated_at: normalizeDate(data.updated_at),
+  };
 };
 
 export const getMultipleTaskProgress = async (
@@ -68,8 +88,13 @@ export const getMultipleTaskProgress = async (
   const querySnapshot = await getDocs(q);
 
   const result: Record<string, TaskProgress> = {};
-  querySnapshot.forEach((doc) => {
-    result[doc.data().task_id] = doc.data() as TaskProgress;
+  querySnapshot.forEach((docSnap) => {
+    const data = docSnap.data();
+    result[data.task_id] = {
+      task_id: data.task_id,
+      task_status: data.task_status,
+      updated_at: normalizeDate(data.updated_at),
+    };
   });
   return result;
 };

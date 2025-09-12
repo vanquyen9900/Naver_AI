@@ -163,7 +163,10 @@ const DataAnalyticsPage = () => {
           </div>
         </div>
       </div>
+      
     );
+
+
 };
 
 export default DataAnalyticsPage;

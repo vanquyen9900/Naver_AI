@@ -115,24 +115,12 @@ const AnalyticsReport = ({ tasks }: Props) => {
             }
           }
 
-          // Check completed tasks
-          if (
-            task.progress?.status === TaskStatus.COMPLETED &&
-            task.progress.completedAt
-          ) {
-            try {
-              // Ensure completedAt is a Date object
-              const completedDate =
-                task.progress.completedAt instanceof Date
-                  ? task.progress.completedAt
-                  : new Date(task.progress.completedAt);
-
-              if (completedDate >= startOfWeek && completedDate <= endOfWeek) {
-                const completedDayIndex = completedDate.getDay();
-                workload[completedDayIndex].completedTasks += 1;
-              }
-            } catch (error) {
-              console.error("Error processing completedAt date:", error, task);
+          // Check completed tasks using completedAt instead of updatedAt
+          if (task.progress?.status === TaskStatus.COMPLETED) {
+            const completedDate = new Date(task.progress.completedAt!);
+            if (completedDate >= startOfWeek && completedDate <= endOfWeek) {
+              const completedDayIndex = completedDate.getDay();
+              workload[completedDayIndex].completedTasks += 1;
             }
           }
         }
