@@ -8,7 +8,7 @@ interface Props {
 }
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
-const TaskActions: React.FC<Props> = ({ onCreate, onReload }) => {
+const TaskActions: React.FC<Props> = ({ onCreate}) => {
   const navigate = useNavigate();
   const location = useLocation();
 
