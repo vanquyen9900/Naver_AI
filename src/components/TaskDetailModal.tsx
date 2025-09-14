@@ -49,7 +49,7 @@ const TaskDetailModal: React.FC<Props> = ({ open, onClose, task }) => {
         setChildStatuses(statuses);
       } catch (err) {
         console.error(err);
-        toast.error("Không thể tải danh sách công việc con");
+        toast.error("Unable to load subtasks");
       } finally {
         setLoading(false);
       }
@@ -72,7 +72,7 @@ const TaskDetailModal: React.FC<Props> = ({ open, onClose, task }) => {
       setChildStatuses((prev) => ({ ...prev, [childId]: newStatus }));
     } catch (err) {
       console.error(err);
-      toast.error("Không thể cập nhật trạng thái");
+      toast.error("Unable to update status");
     }
   };
 
@@ -88,12 +88,12 @@ const TaskDetailModal: React.FC<Props> = ({ open, onClose, task }) => {
       setChildStatuses((prev) => ({ ...prev, [childId]: newStatus }));
       toast.success(
         newStatus === TaskStatus.CANCELLED
-          ? "Đã huỷ công việc"
-          : "Đã khôi phục công việc"
+          ? "Task cancelled"
+          : "Task restored"
       );
     } catch (err) {
       console.error(err);
-      toast.error("Không thể cập nhật trạng thái");
+      toast.error("Unable to update status");
     }
   };
 
@@ -103,8 +103,8 @@ const TaskDetailModal: React.FC<Props> = ({ open, onClose, task }) => {
   };
 
   const formatDate = (date: Date | null | undefined) => {
-    if (!date) return "Chưa đặt";
-    return new Date(date).toLocaleString("vi-VN", {
+    if (!date) return "Not set";
+    return new Date(date).toLocaleString("en-US", {
       weekday: "long",
       year: "numeric",
       month: "2-digit",
@@ -139,16 +139,16 @@ const TaskDetailModal: React.FC<Props> = ({ open, onClose, task }) => {
         <div className="task-parent-info">
           <div className="task-meta">
             <span className={`task-level level-${task.level}`}>
-              {task.level ? LEVEL_LABELS[task.level] : "Chưa phân loại"}
+              {task.level ? LEVEL_LABELS[task.level] : "Uncategorized"}
             </span>
           </div>
           <div className="task-dates">
             <div className="date-item">
-              <span className="date-label">Bắt đầu:</span>
+              <span className="date-label">Start:</span>
               <span className="date-value">{formatDate(task.start_time)}</span>
             </div>
             <div className="date-item">
-              <span className="date-label">Kết thúc:</span>
+              <span className="date-label">End:</span>
               <span className="date-value">{formatDate(task.end_time)}</span>
             </div>
           </div>
@@ -156,7 +156,7 @@ const TaskDetailModal: React.FC<Props> = ({ open, onClose, task }) => {
 
         <div className="child-tasks-section">
           <div className="section-header">
-            <h3>Danh sách công việc con</h3>
+            <h3>Subtasks</h3>
             <button
               className="add-child-btn"
               onClick={() => {
@@ -164,14 +164,14 @@ const TaskDetailModal: React.FC<Props> = ({ open, onClose, task }) => {
                 setShowAddChildModal(true);
               }}
             >
-              ➕ Thêm công việc con
+              ➕ Add Subtask
             </button>
           </div>
 
           {loading ? (
             <div className="loading-state">
               <div className="loading-spinner" />
-              <p>Đang tải danh sách công việc con...</p>
+              <p>Loading subtasks...</p>
             </div>
           ) : sortedChildTasks.length > 0 ? (
             <div className="child-tasks-list">
@@ -208,7 +208,7 @@ const TaskDetailModal: React.FC<Props> = ({ open, onClose, task }) => {
                       <span className={`task-level level-${child.level}`}>
                         {child.level
                           ? LEVEL_LABELS[child.level]
-                          : "Chưa phân loại"}
+                          : "Uncategorized"}
                       </span>
                     </div>
                     <div className="task-times">
@@ -228,7 +228,7 @@ const TaskDetailModal: React.FC<Props> = ({ open, onClose, task }) => {
                       <button
                         className="action-btn edit"
                         onClick={() => handleEditTask(child)}
-                        title="Chỉnh sửa"
+                        title="Edit"
                       >
                         ✏️
                       </button>
@@ -242,8 +242,8 @@ const TaskDetailModal: React.FC<Props> = ({ open, onClose, task }) => {
                       onClick={() => handleCancelRestore(child.id)}
                       title={
                         childStatuses[child.id] === TaskStatus.CANCELLED
-                          ? "Khôi phục"
-                          : "Huỷ bỏ"
+                          ? "Restore"
+                          : "Cancel"
                       }
                     >
                       {childStatuses[child.id] === TaskStatus.CANCELLED
@@ -256,8 +256,8 @@ const TaskDetailModal: React.FC<Props> = ({ open, onClose, task }) => {
             </div>
           ) : (
             <div className="empty-state">
-              <p>Chưa có công việc con nào</p>
-              <p>Hãy thêm công việc con để bắt đầu! ✨</p>
+              <p>No subtasks yet</p>
+              <p>Add a subtask to get started! ✨</p>
             </div>
           )}
         </div>
@@ -288,9 +288,7 @@ const TaskDetailModal: React.FC<Props> = ({ open, onClose, task }) => {
               }));
 
               toast.success(
-                editingTask
-                  ? "Đã cập nhật công việc con"
-                  : "Đã thêm công việc con"
+                editingTask ? "Subtask updated" : "Subtask added"
               );
               setShowAddChildModal(false);
               setEditingTask(null);
@@ -298,8 +296,8 @@ const TaskDetailModal: React.FC<Props> = ({ open, onClose, task }) => {
               console.error(err);
               toast.error(
                 editingTask
-                  ? "Không thể cập nhật công việc con"
-                  : "Không thể thêm công việc con"
+                  ? "Unable to update subtask"
+                  : "Unable to add subtask"
               );
             }
           }}

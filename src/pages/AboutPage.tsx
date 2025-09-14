@@ -23,7 +23,7 @@ const AboutPage: React.FC = () => {
           );
         } catch (error) {
           console.error("Error creating user:", error);
-          toast.error("Có lỗi xảy ra khi tạo người dùng");
+          toast.error("An error occurred while creating the user");
         }
       }
     });
@@ -44,12 +44,12 @@ const AboutPage: React.FC = () => {
           loggedInUser.displayName || "User",
           loggedInUser.email || ""
         );
-        toast.success(`Xin chào ${loggedInUser.displayName}!`);
+        toast.success(`Hello ${loggedInUser.displayName}!`);
         navigate("/tasks");
       }
     } catch (error) {
       console.error("Login error:", error);
-      toast.error("Đăng nhập thất bại, vui lòng thử lại.");
+      toast.error("Login failed, please try again.");
     }
   }, [user, navigate]);
 
@@ -115,7 +115,7 @@ const AboutPage: React.FC = () => {
           initial="hidden"
           animate="visible"
         >
-          <span className="gradient-text">Chào mừng tới Task Manager</span>
+          <span className="gradient-text">Welcome to Task Manager</span>
         </motion.h1>
 
         <motion.div
@@ -125,11 +125,10 @@ const AboutPage: React.FC = () => {
           animate="visible"
         >
           <p className="desc-line">
-            Đây là trang web lập lịch và quản lý thời gian dành cho sinh viên.
+            This is a scheduling and time management website for students.
           </p>
           <p className="desc-line highlight">
-            Hãy trải nghiệm ngay để sắp xếp ngày học tập và làm việc khoa học
-            hơn!
+            Try it now to organize your study and work schedule more efficiently!
           </p>
         </motion.div>
 
@@ -142,7 +141,7 @@ const AboutPage: React.FC = () => {
           whileTap="tap"
           onClick={handleExperience}
         >
-          <span className="btn-text">Trải nghiệm ngay</span>
+          <span className="btn-text">Try Now</span>
           <span className="btn-icon">→</span>
         </motion.button>
       </div>

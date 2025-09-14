@@ -19,14 +19,14 @@ const ConfirmModal: React.FC<ConfirmModalProps> = ({
   return (
     <div className="modal-overlay animate-fadeIn">
       <div className="modal-box animate-slideIn">
-        <h2 className="modal-title">Xác nhận</h2>
+        <h2 className="modal-title">Confirmation</h2>
         <p className="modal-message">{message}</p>
         <div className="modal-actions">
           <button className="btn btn-secondary" onClick={onCancel}>
-            Hủy
+            Cancel
           </button>
           <button className="btn btn-danger" onClick={onConfirm}>
-            Xóa
+            Delete
           </button>
         </div>
       </div>

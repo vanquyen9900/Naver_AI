@@ -10,14 +10,14 @@ import {
 } from "firebase/auth";
 import { getFirestore } from "firebase/firestore";
 
-const firebaseConfig = {
-  apiKey: "AIzaSyC7IJJW9Wcb9UtFbXk3q10DAVGF-7_sjgI",
-  authDomain: "naverai-hackathon.firebaseapp.com",
-  projectId: "naverai-hackathon",
-  storageBucket: "naverai-hackathon.firebasestorage.app",
-  messagingSenderId: "91763174370",
-  appId: "1:91763174370:web:eb23cd6486d42acf0aa7bb",
-  measurementId: "G-BRN1EW1ZXZ"
+const firebaseConfig = { 
+  apiKey : "AIzaSyAzbp6Gbtosy_slSrlq-k2MYz33TRmEF7Q" , 
+  authDomain : "naver-ai-b9c56.firebaseapp.com" , 
+  projectId : "naver-ai-b9c56" , 
+  storageBucket : "naver-ai-b9c56.firebasestorage.app" , 
+  messagingSenderId : "475712203216" , 
+  appId : "1:475712203216:web:a5035b2a25d2d004e671d5" , 
+  measurementId : "G-D6MXPCT20B" 
 };
 
 

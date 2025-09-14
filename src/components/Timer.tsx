@@ -19,17 +19,15 @@ const Timer = ({ taskName, endTime, onClose }: TimerProps) => {
   const [timeLeft, setTimeLeft] = useState<number>(0);
   const [customTime, setCustomTime] = useState<number>(0);
   const audioRef = useRef<HTMLAudioElement>(null);
-  //   const [setLastNotificationPercentage] = useState<number>(0);
 
   const notificationPoints: NotificationPoint[] = [
-    { percentage: 50, message: "Còn 50% thời gian!", soundType: "warning" },
-    { percentage: 90, message: "Sắp hết giờ - còn 10%!", soundType: "alert" },
-    { percentage: 100, message: "Hết giờ!", soundType: "complete" },
+    { percentage: 50, message: "50% time remaining!", soundType: "warning" },
+    { percentage: 90, message: "Almost out of time - 10% left!", soundType: "alert" },
+    { percentage: 100, message: "Time's up!", soundType: "complete" },
   ];
 
   const playSound = (type: "alert" | "warning" | "complete") => {
     const context = new (window.AudioContext ||
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
       (window as any).webkitAudioContext)();
     const oscillator = context.createOscillator();
     const gainNode = context.createGain();
@@ -38,7 +36,7 @@ const Timer = ({ taskName, endTime, onClose }: TimerProps) => {
     gainNode.connect(context.destination);
 
     switch (type) {
-      case "warning": // 50% remaining
+      case "warning":
         oscillator.frequency.value = 440;
         oscillator.type = "sine";
         gainNode.gain.value = 0.3;
@@ -50,7 +48,7 @@ const Timer = ({ taskName, endTime, onClose }: TimerProps) => {
         }, 800);
         break;
 
-      case "alert": // 10% remaining
+      case "alert":
         oscillator.frequency.value = 880;
         oscillator.type = "square";
         gainNode.gain.value = 0.4;
@@ -114,7 +112,7 @@ const Timer = ({ taskName, endTime, onClose }: TimerProps) => {
       setTimeLeft((prev) => {
         if (prev <= 0) {
           clearInterval(timer);
-          notify("Hết giờ!", "complete");
+          notify("Time's up!", "complete");
           return 0;
         }
 
@@ -149,13 +147,12 @@ const Timer = ({ taskName, endTime, onClose }: TimerProps) => {
   const handleCustomTime = (minutes: number) => {
     const maxMinutes = Math.floor((endTime.getTime() - Date.now()) / 60000);
     if (minutes > maxMinutes) {
-      toast.warning(`Thời gian tối đa cho phép là ${maxMinutes} phút`, {
+      toast.warning(`Maximum allowed time is ${maxMinutes} minutes`, {
         position: "top-right",
       });
       return;
     }
     setCustomTime(minutes * 60000);
-    // setLastNotificationPercentage(0); // Reset notification tracking for new timer
   };
 
   return (
@@ -167,13 +164,13 @@ const Timer = ({ taskName, endTime, onClose }: TimerProps) => {
         <div className="timer-controls">
           <input
             type="number"
-            placeholder="Đặt số phút"
+            placeholder="Set minutes"
             min="1"
             max={Math.floor((endTime.getTime() - Date.now()) / 60000)}
             onChange={(e) => handleCustomTime(parseInt(e.target.value))}
           />
           <button onClick={onClose} className="close-button">
-            Đóng
+            Close
           </button>
         </div>
 

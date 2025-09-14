@@ -92,7 +92,7 @@ const AnalyticsSummary = ({ tasks }: Props) => {
   return (
     <div className="monthly-summary">
       <div className="summary-header">
-        <h2>Tiến độ công việc tháng</h2>
+        <h2>Monthly Task Progress</h2>
         <input
           type="month"
           value={`${selectedMonth.getFullYear()}-${String(

@@ -15,15 +15,15 @@ const UserHeader: React.FC<Props> = ({ displayName, photoURL }) => {
   const handleLogout = async () => {
     await auth.signOut();
     await navigate("/");
-    toast.info("Đã đăng xuất!");
+    toast.info("Logged out!");
   };
 
   return (
     <div className="tasks-header">
       {photoURL && <img src={photoURL} alt="avatar" className="user-avatar" />}
-      <h2 className="user-name">{displayName ?? "Người dùng"}</h2>
+      <h2 className="user-name">{displayName ?? "User"}</h2>
       <button className="btn-logout" onClick={handleLogout}>
-        Đăng xuất
+        Logout
       </button>
     </div>
   );

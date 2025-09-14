@@ -36,7 +36,7 @@ const TaskList: React.FC<Props> = ({ tasks, onEdit }) => {
       setTaskStatuses(Object.fromEntries(statuses));
     } catch (error) {
       console.error("Error loading task statuses:", error);
-      toast.error("Không thể tải trạng thái công việc");
+      toast.error("Unable to load task statuses");
     } finally {
       setLoading(false);
     }
@@ -52,18 +52,18 @@ const TaskList: React.FC<Props> = ({ tasks, onEdit }) => {
       try {
         await updateTaskProgress(taskId, status);
         setTaskStatuses((prev) => ({ ...prev, [taskId]: status }));
-        toast.success("Đã cập nhật");
+        toast.success("Updated successfully");
       } catch (err) {
         console.error(err);
-        toast.error("Không thể cập nhật trạng thái");
+        toast.error("Unable to update status");
       }
     },
     []
   );
 
   const formatDate = useCallback((date: Date | null | undefined) => {
-    if (!date) return "Chưa đặt";
-    return new Date(date).toLocaleString("vi-VN", {
+    if (!date) return "Not set";
+    return new Date(date).toLocaleString("en-GB", {
       weekday: "short",
       year: "numeric",
       month: "2-digit",
@@ -118,7 +118,7 @@ const TaskList: React.FC<Props> = ({ tasks, onEdit }) => {
           }}
         >
           {taskStatuses[task.id] !== TaskStatus.COMPLETED && isTaskOverdue(task)
-            ? "Quá hạn"
+            ? "Overdue"
             : TASK_STATUS_LABELS[
                 taskStatuses[task.id] || TaskStatus.NOT_STARTED
               ]}
@@ -134,11 +134,11 @@ const TaskList: React.FC<Props> = ({ tasks, onEdit }) => {
 
           <div className="task-time-section">
             <div className="time-item">
-              <span className="time-label">Bắt đầu:</span>
+              <span className="time-label">Start:</span>
               <span className="time-value">{formatDate(task.start_time)}</span>
             </div>
             <div className="time-item">
-              <span className="time-label">Kết thúc:</span>
+              <span className="time-label">End:</span>
               <span className="time-value">{formatDate(task.end_time)}</span>
             </div>
           </div>
@@ -147,7 +147,7 @@ const TaskList: React.FC<Props> = ({ tasks, onEdit }) => {
         <div className="task-footer">
           <div className="task-info-section">
             <div className={`task-level level-${task.level || 0}`}>
-              {task.level ? LEVEL_LABELS[task.level] : "Chưa phân loại"}
+              {task.level ? LEVEL_LABELS[task.level] : "Uncategorized"}
             </div>
           </div>
 
@@ -159,10 +159,10 @@ const TaskList: React.FC<Props> = ({ tasks, onEdit }) => {
                 setShowDetail(true);
               }}
             >
-              👁️ Xem chi tiết
+              👁️ View Details
             </button>
             <button className="btn btn-edit" onClick={() => onEdit(task)}>
-              ✏️ Sửa
+              ✏️ Edit
             </button>
             <select
               className="status-select"
@@ -204,8 +204,8 @@ const TaskList: React.FC<Props> = ({ tasks, onEdit }) => {
   if (!sortedTasks.length) {
     return (
       <div className="empty-state">
-        <h3>Không có công việc nào</h3>
-        <p>Hãy tạo công việc mới để bắt đầu! ✨</p>
+        <h3>No tasks available</h3>
+        <p>Create a new task to get started! ✨</p>
       </div>
     );
   }

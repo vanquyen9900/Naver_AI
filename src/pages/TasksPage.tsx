@@ -34,7 +34,7 @@ const TasksPage: React.FC = () => {
       setTasks(list);
     } catch (err) {
       console.error(err);
-      toast.error("Tải lịch thất bại");
+      toast.error("Failed to load tasks");
     } finally {
       setLoading(false);
     }
@@ -63,13 +63,13 @@ const TasksPage: React.FC = () => {
     if (!toDelete) return;
     try {
       await deleteTask(toDelete.id);
-      toast.success("Xóa thành công");
+      toast.success("Deleted successfully");
       setConfirmOpen(false);
       setToDelete(null);
       loadTasks();
     } catch (err) {
       console.error(err);
-      toast.error("Xóa thất bại");
+      toast.error("Failed to delete task");
     }
   };
 
@@ -89,7 +89,7 @@ const TasksPage: React.FC = () => {
       />
 
       <p className="welcome-text">
-        Chào mừng bạn đã đến lịch hoạt động của bạn ✨
+        Welcome to your activity schedule ✨
       </p>
 
       {/* Actions */}
@@ -98,7 +98,7 @@ const TasksPage: React.FC = () => {
       {/* Task list */}
       <div className="tasks-list">
         {loading ? (
-          <p>Đang tải...</p>
+          <p>Loading...</p>
         ) : (
           <TaskList tasks={tasks} onEdit={handleEdit} />
         )}
@@ -117,7 +117,7 @@ const TasksPage: React.FC = () => {
         open={confirmOpen}
         onCancel={() => setConfirmOpen(false)}
         onConfirm={handleConfirmDelete}
-        message="Bạn có muốn xóa lịch này không? Hành động không thể hoàn tác."
+        message="Do you want to delete this task? This action cannot be undone."
       />
     </motion.div>
   );

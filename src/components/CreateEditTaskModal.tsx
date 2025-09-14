@@ -14,11 +14,11 @@ interface Props {
 }
 
 const levels = [
-  { value: 1, label: "Rất quan trọng" },
-  { value: 2, label: "Quan trọng" },
-  { value: 3, label: "Bình thường" },
-  { value: 4, label: "Thường ngày" },
-  { value: 5, label: "Rảnh rỗi" },
+  { value: 1, label: "Very Important" },
+  { value: 2, label: "Important" },
+  { value: 3, label: "Normal" },
+  { value: 4, label: "Routine" },
+  { value: 5, label: "Leisure" },
 ];
 
 const CreateEditTaskModal: React.FC<Props> = ({
@@ -67,11 +67,11 @@ const CreateEditTaskModal: React.FC<Props> = ({
     const startDate = start ? new Date(start) : null;
 
     if (!edit && startDate && startDate < now) {
-      return "Thời gian bắt đầu không thể trong quá khứ";
+      return "Start time cannot be in the past";
     }
 
     if (start && end && new Date(start) > new Date(end)) {
-      return "Thời gian bắt đầu phải trước thời gian kết thúc";
+      return "Start time must be before end time";
     }
 
     return null;
@@ -81,12 +81,12 @@ const CreateEditTaskModal: React.FC<Props> = ({
   const handleSave = async () => {
     const currentUser = auth.currentUser;
     if (!currentUser) {
-      toast.error("Bạn chưa đăng nhập");
+      toast.error("You are not logged in");
       return;
     }
 
     if (!taskName.trim()) {
-      toast.error("Tên công việc không được để trống");
+      toast.error("Task name cannot be empty");
       return;
     }
 
@@ -109,12 +109,12 @@ const CreateEditTaskModal: React.FC<Props> = ({
       };
 
       await saveTaskWithLevel(currentUser.uid, taskData);
-      toast.success(edit ? "Cập nhật thành công" : "Thêm mới thành công");
+      toast.success(edit ? "Update successful" : "Added successfully");
       onClose();
       onSaved();
     } catch (err) {
       console.error(err);
-      toast.error("Lưu thất bại");
+      toast.error("Save failed");
     }
   };
 
@@ -125,7 +125,7 @@ const CreateEditTaskModal: React.FC<Props> = ({
       <div className="modal-box animate-slideIn">
         <div className="modal-header">
           <h2 className="modal-title">
-            {edit ? "Chỉnh sửa công việc" : "Thêm công việc mới"}
+            {edit ? "Edit Task" : "Add New Task"}
           </h2>
           <button className="btn-close" onClick={onClose}>
             ×
@@ -133,31 +133,31 @@ const CreateEditTaskModal: React.FC<Props> = ({
         </div>
 
         <div className="form-group">
-          <label htmlFor="taskName">Tên công việc:</label>
+          <label htmlFor="taskName">Task Name:</label>
           <input
             id="taskName"
             type="text"
             className="input"
             value={taskName}
             onChange={(e) => setTaskName(e.target.value)}
-            placeholder="Nhập tên công việc..."
+            placeholder="Enter task name..."
           />
         </div>
 
         <div className="form-group">
-          <label htmlFor="taskDetail">Chi tiết:</label>
+          <label htmlFor="taskDetail">Details:</label>
           <textarea
             id="taskDetail"
             className="input"
             value={taskDetail}
             onChange={(e) => setTaskDetail(e.target.value)}
-            placeholder="Nhập chi tiết công việc..."
+            placeholder="Enter task details..."
             rows={4}
           />
         </div>
 
         <div className="form-group">
-          <label htmlFor="level">Mức độ quan trọng:</label>
+          <label htmlFor="level">Priority Level:</label>
           <select
             id="level"
             className="input"
@@ -173,7 +173,7 @@ const CreateEditTaskModal: React.FC<Props> = ({
         </div>
 
         <div className="form-group">
-          <label htmlFor="startTime">Thời gian bắt đầu:</label>
+          <label htmlFor="startTime">Start Time:</label>
           <input
             id="startTime"
             type="datetime-local"
@@ -184,7 +184,7 @@ const CreateEditTaskModal: React.FC<Props> = ({
         </div>
 
         <div className="form-group">
-          <label htmlFor="endTime">Thời gian kết thúc:</label>
+          <label htmlFor="endTime">End Time:</label>
           <input
             id="endTime"
             type="datetime-local"
@@ -196,10 +196,10 @@ const CreateEditTaskModal: React.FC<Props> = ({
 
         <div className="modal-actions">
           <button className="btn btn-secondary" onClick={onClose}>
-            Huỷ
+            Cancel
           </button>
           <button className="btn btn-primary" onClick={handleSave}>
-            {edit ? "Cập nhật" : "Thêm"}
+            {edit ? "Update" : "Add"}
           </button>
         </div>
       </div>

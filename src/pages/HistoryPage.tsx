@@ -76,7 +76,7 @@ const HistoryPage: React.FC = () => {
       setChildStatuses(childStatusMap);
     } catch (error) {
       console.error("Error loading history:", error);
-      toast.error("Không thể tải lịch sử công việc");
+      toast.error("Failed to load task history");
     } finally {
       setLoading(false);
     }
@@ -131,7 +131,7 @@ const HistoryPage: React.FC = () => {
         photoURL={auth.currentUser?.photoURL || ""}
       />
       <div className="history-header">
-        <h2>Lịch sử công việc</h2>
+        <h2>Task History</h2>
         <TaskActions
           onCreate={() => {}}
           onReload={() => window.location.reload()}
@@ -141,13 +141,13 @@ const HistoryPage: React.FC = () => {
       <div className="search-filters">
         <div className="search-group">
           <label htmlFor="searchName">
-            <i className="fas fa-search"></i> Tìm kiếm theo tên:
+            <i className="fas fa-search"></i> Search by Name:
           </label>
           <input
             id="searchName"
             type="text"
             className="search-input"
-            placeholder="Nhập tên công việc..."
+            placeholder="Enter task name..."
             value={searchName}
             onChange={(e) => setSearchName(e.target.value)}
           />
@@ -156,7 +156,7 @@ const HistoryPage: React.FC = () => {
         <div className="search-date-range">
           <div className="search-group">
             <label htmlFor="searchStartDate">
-              <i className="far fa-calendar-alt"></i> Từ ngày:
+              <i className="far fa-calendar-alt"></i> From:
             </label>
             <input
               id="searchStartDate"
@@ -168,7 +168,7 @@ const HistoryPage: React.FC = () => {
           </div>
           <div className="search-group">
             <label htmlFor="searchEndDate">
-              <i className="far fa-calendar-alt"></i> Đến ngày:
+              <i className="far fa-calendar-alt"></i> To:
             </label>
             <input
               id="searchEndDate"
@@ -182,7 +182,7 @@ const HistoryPage: React.FC = () => {
 
         <div className="search-group">
           <label htmlFor="statusFilter">
-            <i className="fas fa-filter"></i> Lọc theo trạng thái:
+            <i className="fas fa-filter"></i> Filter by Status:
           </label>
           <select
             id="statusFilter"
@@ -190,11 +190,11 @@ const HistoryPage: React.FC = () => {
             value={selectedStatus}
             onChange={(e) => setSelectedStatus(e.target.value)}
           >
-            <option value="all">Tất cả trạng thái</option>
-            <option value={TaskStatus.NOT_STARTED}>Chưa bắt đầu</option>
-            <option value={TaskStatus.IN_PROGRESS}>Đang thực hiện</option>
-            <option value={TaskStatus.COMPLETED}>Đã hoàn thành</option>
-            <option value={TaskStatus.CANCELLED}>Đã huỷ bỏ</option>
+            <option value="all">All Statuses</option>
+            <option value={TaskStatus.NOT_STARTED}>Not Started</option>
+            <option value={TaskStatus.IN_PROGRESS}>In Progress</option>
+            <option value={TaskStatus.COMPLETED}>Completed</option>
+            <option value={TaskStatus.CANCELLED}>Cancelled</option>
           </select>
         </div>
       </div>
@@ -203,12 +203,12 @@ const HistoryPage: React.FC = () => {
         {loading ? (
           <div className="loading-state">
             <div className="loading-spinner" />
-            <p>Đang tải lịch sử công việc...</p>
+            <p>Loading task history...</p>
           </div>
         ) : filteredTasks.length === 0 ? (
           <div className="empty-state">
             <i className="far fa-folder-open"></i>
-            <p>Không tìm thấy công việc nào phù hợp.</p>
+            <p>No matching tasks found.</p>
           </div>
         ) : (
           <div className="history-list">

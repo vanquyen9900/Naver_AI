@@ -19,10 +19,11 @@ export const TaskStatus = {
 export type TaskStatus = (typeof TaskStatus)[keyof typeof TaskStatus];
 
 export const TASK_STATUS_LABELS: Record<TaskStatus, string> = {
-  [TaskStatus.NOT_STARTED]: "Chưa làm",
-  [TaskStatus.IN_PROGRESS]: "Đang làm",
-  [TaskStatus.COMPLETED]: "Hoàn thành",
-  [TaskStatus.CANCELLED]: "Huỷ bỏ",
+  [TaskStatus.NOT_STARTED]: "Not Started",
+  [TaskStatus.IN_PROGRESS]: "In Progress",
+  [TaskStatus.COMPLETED]: "Completed",
+  [TaskStatus.CANCELLED]: "Cancelled",
+
 };
 
 export const TASK_STATUS_COLORS: Record<TaskStatus, string> = {

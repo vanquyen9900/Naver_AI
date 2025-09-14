@@ -15,11 +15,11 @@ interface Props {
 }
 
 const levels = [
-  { value: 1, label: "Rất quan trọng" },
-  { value: 2, label: "Quan trọng" },
-  { value: 3, label: "Bình thường" },
-  { value: 4, label: "Thường ngày" },
-  { value: 5, label: "Rảnh rỗi" },
+  { value: 1, label: "Very Important" },
+  { value: 2, label: "Important" },
+  { value: 3, label: "Normal" },
+  { value: 4, label: "Routine" },
+  { value: 5, label: "Leisure" },
 ];
 
 const CreateChildTaskModal: React.FC<Props> = ({
@@ -70,11 +70,11 @@ const CreateChildTaskModal: React.FC<Props> = ({
     const startDate = start ? new Date(start) : null;
 
     if (!editTask && startDate && startDate < now) {
-      return "Thời gian bắt đầu không thể trong quá khứ";
+      return "Start time cannot be in the past";
     }
 
     if (start && end && new Date(start) > new Date(end)) {
-      return "Thời gian bắt đầu phải trước thời gian kết thúc";
+      return "Start time must be before end time";
     }
 
     return null;
@@ -83,12 +83,12 @@ const CreateChildTaskModal: React.FC<Props> = ({
   // Sửa hàm handleSave
   const handleSave = async () => {
     if (!auth.currentUser) {
-      toast.error("Bạn chưa đăng nhập");
+      toast.error("You are not logged in");
       return;
     }
 
     if (!childName.trim() || !childDetail.trim()) {
-      toast.error("Tên và chi tiết công việc con không được để trống");
+      toast.error("Task name and details cannot be empty");
       return;
     }
 
@@ -110,7 +110,7 @@ const CreateChildTaskModal: React.FC<Props> = ({
           end_time: childEndTime ? new Date(childEndTime) : null,
         };
         onEdit(updatedTask);
-        toast.success("Đã cập nhật công việc con");
+        toast.success("Child task updated successfully");
       } else {
         const newChild: Omit<TaskChild, "id" | "parent_id"> = {
           task_name: childName,
@@ -122,12 +122,12 @@ const CreateChildTaskModal: React.FC<Props> = ({
           createdAt: new Date(),
         };
         onSaved(newChild);
-        toast.success("Đã thêm công việc con");
+        toast.success("Child task added successfully");
       }
       handleClose();
     } catch (err) {
       console.error(err);
-      toast.error(editTask ? "Không thể cập nhật" : "Không thể thêm");
+      toast.error(editTask ? "Unable to update" : "Unable to add");
     }
   };
 
@@ -136,7 +136,7 @@ const CreateChildTaskModal: React.FC<Props> = ({
       <div className="modal-box animate-slideIn">
         <div className="modal-header">
           <h3 className="modal-title">
-            {editTask ? "Sửa công việc con" : "Thêm công việc con"}
+            {editTask ? "Edit Child Task" : "Add Child Task"}
           </h3>
           <button className="btn-close" onClick={handleClose}>
             ×
@@ -144,27 +144,27 @@ const CreateChildTaskModal: React.FC<Props> = ({
         </div>
 
         <div className="form-group">
-          <label>Tên công việc *</label>
+          <label>Task Name *</label>
           <input
             type="text"
             className="input"
             value={childName}
             onChange={(e) => setChildName(e.target.value)}
-            placeholder="Nhập tên công việc con"
+            placeholder="Enter child task name"
           />
         </div>
         <div className="form-group">
-          <label>Chi tiết *</label>
+          <label>Details *</label>
           <textarea
             className="input"
             value={childDetail}
             onChange={(e) => setChildDetail(e.target.value)}
-            placeholder="Nhập chi tiết công việc con"
+            placeholder="Enter child task details"
             rows={4}
           />
         </div>
         <div className="form-group">
-          <label>Mức độ</label>
+          <label>Priority</label>
           <select
             className="input"
             value={childLevel}
@@ -178,7 +178,7 @@ const CreateChildTaskModal: React.FC<Props> = ({
           </select>
         </div>
         <div className="form-group">
-          <label>Bắt đầu</label>
+          <label>Start</label>
           <input
             type="datetime-local"
             className="input"
@@ -187,7 +187,7 @@ const CreateChildTaskModal: React.FC<Props> = ({
           />
         </div>
         <div className="form-group">
-          <label>Kết thúc</label>
+          <label>End</label>
           <input
             type="datetime-local"
             className="input"
@@ -198,10 +198,10 @@ const CreateChildTaskModal: React.FC<Props> = ({
 
         <div className="modal-actions">
           <button className="btn btn-secondary" onClick={handleClose}>
-            Hủy
+            Cancel
           </button>
           <button className="btn btn-primary" onClick={handleSave}>
-            {editTask ? "Cập nhật" : "Thêm"}
+            {editTask ? "Update" : "Add"}
           </button>
         </div>
       </div>

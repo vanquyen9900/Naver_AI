@@ -17,11 +17,11 @@ import { db } from "./firebase";
 
 /** level labels */
 export const LEVEL_LABELS: Record<number, string> = {
-  1: "Rất quan trọng",
-  2: "Quan trọng",
-  3: "Bình thường",
-  4: "Thường ngày",
-  5: "Rảnh rỗi",
+  1: "Very Important",
+  2: "Important",
+  3: "Normal",
+  4: "Daily",
+  5: "Leisure",
 };
 
 interface BaseTask {
@@ -93,11 +93,11 @@ export const createChildTask = async (
   const parentRef = doc(db, "tasks", parentId);
   const parentSnap = await getDoc(parentRef);
   if (!parentSnap.exists()) {
-    throw new Error("Parent task không tồn tại");
+    throw new Error("Parent task does not exist");
   }
   const parentData = parentSnap.data();
   if (parentData.user_id !== uid) {
-    throw new Error("Không có quyền thêm công việc con cho task này");
+    throw new Error("You do not have permission to add a subtask to this task");
   }
 
   // Create child

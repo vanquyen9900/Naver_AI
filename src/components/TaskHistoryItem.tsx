@@ -29,13 +29,13 @@ const TaskHistoryItem: React.FC<Props> = ({
   const formatDate = useCallback((date: Date | null | undefined) => {
     if (!date) return null;
     return {
-      date: new Date(date).toLocaleDateString("vi-VN", {
+      date: new Date(date).toLocaleDateString("en-GB", {
         weekday: "long",
         year: "numeric",
         month: "2-digit",
         day: "2-digit",
       }),
-      time: new Date(date).toLocaleTimeString("vi-VN", {
+      time: new Date(date).toLocaleTimeString("en-GB", {
         hour: "2-digit",
         minute: "2-digit",
       }),
@@ -47,7 +47,7 @@ const TaskHistoryItem: React.FC<Props> = ({
       setIsRestoring(true);
       await updateTaskProgress(task.id, TaskStatus.NOT_STARTED);
       onStatusUpdate?.();
-      toast.success("Đã khôi phục công việc thành công!", {
+      toast.success("Task successfully restored!", {
         position: "top-right",
         autoClose: 3000,
         hideProgressBar: false,
@@ -56,7 +56,7 @@ const TaskHistoryItem: React.FC<Props> = ({
         draggable: true,
       });
     } catch (error) {
-      toast.error("Không thể khôi phục công việc", {
+      toast.error("Unable to restore task", {
         position: "top-right",
         autoClose: 3000,
       });
@@ -69,10 +69,10 @@ const TaskHistoryItem: React.FC<Props> = ({
   // Status label memoization
   const getStatusLabel = useCallback((status: TaskStatus) => {
     const labels = {
-      [TaskStatus.COMPLETED]: { icon: "✅", text: "Đã hoàn thành" },
-      [TaskStatus.IN_PROGRESS]: { icon: "⏳", text: "Đang thực hiện" },
-      [TaskStatus.CANCELLED]: { icon: "❌", text: "Đã huỷ bỏ" },
-      [TaskStatus.NOT_STARTED]: { icon: "⭕", text: "Chưa bắt đầu" },
+      [TaskStatus.COMPLETED]: { icon: "✅", text: "Completed" },
+      [TaskStatus.IN_PROGRESS]: { icon: "⏳", text: "In Progress" },
+      [TaskStatus.CANCELLED]: { icon: "❌", text: "Cancelled" },
+      [TaskStatus.NOT_STARTED]: { icon: "⭕", text: "Not Started" },
     };
     return labels[status] || labels[TaskStatus.NOT_STARTED];
   }, []);
@@ -86,7 +86,7 @@ const TaskHistoryItem: React.FC<Props> = ({
         <div className="time-info">
           {start && (
             <div className="time-item">
-              <span className="time-label">Bắt đầu:</span>
+              <span className="time-label">Start:</span>
               <div className="time-value">
                 <div>{start.date}</div>
                 <div className="time-detail">⏰ {start.time}</div>
@@ -95,7 +95,7 @@ const TaskHistoryItem: React.FC<Props> = ({
           )}
           {end && (
             <div className="time-item">
-              <span className="time-label">Kết thúc:</span>
+              <span className="time-label">End:</span>
               <div className="time-value">
                 <div>{end.date}</div>
                 <div className="time-detail">⏰ {end.time}</div>
@@ -120,7 +120,7 @@ const TaskHistoryItem: React.FC<Props> = ({
             {task.task_detail && <p>{task.task_detail}</p>}
             <div className="task-meta">
               <span className={`task-level level-${task.level}`}>
-                {task.level ? LEVEL_LABELS[task.level] : "Chưa phân loại"}
+                {task.level ? LEVEL_LABELS[task.level] : "Uncategorized"}
               </span>
               <span className={`task-status status-${taskStatus}`}>
                 {getStatusLabel(taskStatus).icon}{" "}
@@ -137,13 +137,13 @@ const TaskHistoryItem: React.FC<Props> = ({
               onClick={handleRestore}
               disabled={isRestoring}
             >
-              {isRestoring ? "Đang khôi phục..." : "🔄 Khôi phục"}
+              {isRestoring ? "Restoring..." : "🔄 Restore"}
             </button>
           )}
           <button
             className={`expand-btn ${isExpanded ? "expanded" : ""}`}
             onClick={() => setIsExpanded(!isExpanded)}
-            title={isExpanded ? "Thu gọn" : "Mở rộng"}
+            title={isExpanded ? "Collapse" : "Expand"}
           >
             ▼
           </button>
@@ -163,7 +163,7 @@ const TaskHistoryItem: React.FC<Props> = ({
                       <span className={`task-level level-${child.level}`}>
                         {child.level
                           ? LEVEL_LABELS[child.level]
-                          : "Chưa phân loại"}
+                          : "Uncategorized"}
                       </span>
                       <span
                         className={`task-status status-${
@@ -181,7 +181,7 @@ const TaskHistoryItem: React.FC<Props> = ({
             ))
           ) : (
             <div className="no-children">
-              <p>Chưa có công việc con nào.</p>
+              <p>No child tasks available.</p>
             </div>
           )}
         </div>

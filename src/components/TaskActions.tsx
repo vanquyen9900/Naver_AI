@@ -19,20 +19,20 @@ const TaskActions: React.FC<Props> = ({ onCreate, onReload }) => {
     <div className="tasks-actions">
       {!hideCreateButton && (
         <button className="btn-primary" onClick={onCreate}>
-          ➕ Thêm tasks
+          ➕ Add Task
         </button>
       )}
       <button className="btn-calendar" onClick={() => navigate("/calendar")}>
-        📅 Xem lịch
+        📅 View Calendar
       </button>
       <button className="btn-task" onClick={() => navigate("/tasks")}>
-        📋 Danh sách tasks
+        📋 Task List
       </button>
       <button className="btn-history" onClick={() => navigate("/history")}>
-        📜 Lịch sử tasks
+        📜 Task History
       </button>
       <button className="btn-analytics" onClick={() => navigate("/analytics")}>
-        📊 Phân tích dữ liệu
+        📊 Analytics
       </button>
     </div>
   );
