@@ -29,7 +29,7 @@ const DataAnalyticsPage = () => {
   const [activeTab, setActiveTab] = useState<AnalyticsTab>("overview");
   const [loading, setLoading] = useState(true);
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [isModalOpen, setModalOpen] = useState(false);
+  const [_isModalOpen, setModalOpen] = useState(false);
   const [isApiKeyModalOpen, setApiKeyModalOpen] = useState(false);
   const [hasApiKey, setHasApiKey] = useState(false);
   const [isInFallbackMode, setIsInFallbackMode] = useState(false);

@@ -43,7 +43,7 @@ const AnalyticsReport = ({ tasks }: Props) => {
   const [weeklyStats, setWeeklyStats] = useState<TimeFrameStats>();
   const [monthlyStats, setMonthlyStats] = useState<TimeFrameStats>();
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [yearlyStats, setYearlyStats] = useState<TimeFrameStats>();
+  const [_yearlyStats, _setYearlyStats] = useState<TimeFrameStats>();
   const [taskTrends, setTaskTrends] = useState<TaskTrend[]>([]);
   const [weeklyWorkload, setWeeklyWorkload] = useState<WeeklyWorkload[]>([]);
   const [todayStats, setTodayStats] = useState<TimeFrameStats>();
